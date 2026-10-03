@@ -15,10 +15,11 @@ if sys.platform == "win32":
         sys.stderr.reconfigure(encoding="utf-8")
     except Exception:
         pass
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, "isc2_data.json")
-PDF_FILE = os.path.join(BASE_DIR, "Certified in Cybersecurity (CC) Exam Guide.pdf")
+PDF_FILE = os.path.join(BASE_DIR, "Certified_in_Cybersecurity_CC_Exam_Guide.pdf")
+if not os.path.exists(PDF_FILE):
+    PDF_FILE = os.path.join(BASE_DIR, "Certified in Cybersecurity (CC) Exam Guide.pdf")
 
 # Preload data
 if os.path.exists(DATA_FILE):

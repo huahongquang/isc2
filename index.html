@@ -1,0 +1,1916 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ISC2 Certified in Cybersecurity (CC) - Nền tảng học tập & Luyện thi</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+              800: '#166534',
+              900: '#14532d',
+            },
+            isc: {
+              blue: '#0284c7',
+              navy: '#0f172a',
+              accent: '#38bdf8'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Canvas Confetti for celebrating Pass -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    /* Flashcard 3D flip */
+    .perspective-1000 { perspective: 1000px; }
+    .transform-style-3d { transform-style: preserve-3d; }
+    .backface-hidden { backface-visibility: hidden; }
+    .rotate-y-180 { transform: rotateY(180deg); }
+    
+    /* Smooth transitions */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.25s ease-out; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Custom scrollbars */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .dark ::-webkit-scrollbar-thumb { background: #334155; }
+  </style>
+</head>
+<body class="h-full bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-200 flex flex-col font-sans">
+
+  <!-- Top Navigation Header -->
+  <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <!-- Logo & Title -->
+        <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('dashboard')">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-500/20">
+            <i data-lucide="shield-check" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="font-extrabold text-lg tracking-tight bg-gradient-to-r from-emerald-600 to-teal-600 dark:from-emerald-400 dark:to-teal-300 bg-clip-text text-transparent">ISC2 CC</span>
+              <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300/40">Exam Guide</span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">Certified in Cybersecurity (CC) Study & Drill</p>
+          </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="hidden md:flex items-center space-x-1">
+          <button onclick="switchTab('dashboard')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium flex items-center space-x-1.5 transition-all text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50" data-tab="dashboard">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span>Tổng quan</span>
+          </button>
+          <button onclick="switchTab('practice')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium flex items-center space-x-1.5 transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800" data-tab="practice">
+            <i data-lucide="check-circle" class="w-4 h-4"></i>
+            <span>Luyện theo Domain</span>
+          </button>
+          <button onclick="switchTab('exam')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium flex items-center space-x-1.5 transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800" data-tab="exam">
+            <i data-lucide="timer" class="w-4 h-4"></i>
+            <span>Thi thử mô phỏng</span>
+          </button>
+          <button onclick="switchTab('flashcards')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium flex items-center space-x-1.5 transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800" data-tab="flashcards">
+            <i data-lucide="layers" class="w-4 h-4"></i>
+            <span>Flashcards</span>
+          </button>
+          <button onclick="switchTab('study')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium flex items-center space-x-1.5 transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800" data-tab="study">
+            <i data-lucide="book-open" class="w-4 h-4"></i>
+            <span>Cẩm nang lý thuyết</span>
+          </button>
+          <button onclick="switchTab('glossary')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium flex items-center space-x-1.5 transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800" data-tab="glossary">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+            <span>Từ điển thuật ngữ</span>
+          </button>
+          <button onclick="switchTab('mistakes')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium flex items-center space-x-1.5 transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 relative" data-tab="mistakes">
+            <i data-lucide="bookmark" class="w-4 h-4"></i>
+            <span>Ôn câu sai & Đã lưu</span>
+            <span id="mistakeBadge" class="hidden absolute -top-1 -right-1 px-1.5 py-0.2 bg-red-500 text-white rounded-full text-[10px] font-bold">0</span>
+          </button>
+        </nav>
+
+        <!-- Right Tools -->
+        <div class="flex items-center space-x-2">
+          <!-- Open PDF Button -->
+          <a href="/api/pdf" target="_blank" title="Mở sách gốc PDF" class="hidden lg:flex items-center space-x-1 px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+            <i data-lucide="file" class="w-3.5 h-3.5 text-red-500"></i>
+            <span>Mở PDF</span>
+          </a>
+
+          <!-- Dark Mode Toggle -->
+          <button onclick="toggleDarkMode()" class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Chuyển chế độ sáng/tối">
+            <i id="themeIcon" data-lucide="moon" class="w-4 h-4"></i>
+          </button>
+
+          <!-- Mobile Menu Toggle -->
+          <button onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Mobile Navigation Dropdown -->
+      <div id="mobileMenu" class="md:hidden hidden pb-3 pt-2 border-t border-slate-200 dark:border-slate-800 space-y-1">
+        <button onclick="switchTab('dashboard'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium flex items-center space-x-2 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+          <span>Tổng quan</span>
+        </button>
+        <button onclick="switchTab('practice'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium flex items-center space-x-2 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i data-lucide="check-circle" class="w-4 h-4"></i>
+          <span>Luyện theo Domain</span>
+        </button>
+        <button onclick="switchTab('exam'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium flex items-center space-x-2 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i data-lucide="timer" class="w-4 h-4"></i>
+          <span>Thi thử mô phỏng</span>
+        </button>
+        <button onclick="switchTab('flashcards'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium flex items-center space-x-2 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i data-lucide="layers" class="w-4 h-4"></i>
+          <span>Flashcards</span>
+        </button>
+        <button onclick="switchTab('study'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium flex items-center space-x-2 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i data-lucide="book-open" class="w-4 h-4"></i>
+          <span>Cẩm nang lý thuyết</span>
+        </button>
+        <button onclick="switchTab('glossary'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium flex items-center space-x-2 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i data-lucide="file-text" class="w-4 h-4"></i>
+          <span>Từ điển thuật ngữ</span>
+        </button>
+        <button onclick="switchTab('mistakes'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium flex items-center space-x-2 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <i data-lucide="bookmark" class="w-4 h-4"></i>
+          <span>Ôn câu sai & Đã lưu</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Area -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+    <!-- ========================================== -->
+    <!-- TAB 1: DASHBOARD -->
+    <!-- ========================================== -->
+    <div id="tab-dashboard" class="tab-content active space-y-8">
+      
+      <!-- Welcome Hero Banner -->
+      <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white p-6 sm:p-8 shadow-xl border border-emerald-500/20">
+        <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative z-10 max-w-3xl">
+          <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-medium mb-3 border border-emerald-400/30">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+            <span>Dữ liệu chuẩn từ Certified in Cybersecurity (CC) Exam Guide</span>
+          </div>
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Học tập & Luyện thi ISC2 Certified in Cybersecurity</h1>
+          <p class="mt-2 text-slate-300 text-sm sm:text-base leading-relaxed">
+            Nền tảng trang bị cho bạn đầy đủ <span class="text-emerald-400 font-semibold" id="totalQuestionsCount">277</span> câu hỏi trọng tâm, 5 Domain chính thức, thẻ ghi nhớ Flashcard và cẩm nang lý thuyết chắt lọc sát nhất với kỳ thi chứng chỉ bảo mật quốc tế ISC2 CC.
+          </p>
+          <div class="mt-5 flex flex-wrap gap-3">
+            <button onclick="switchTab('practice')" class="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-semibold text-sm shadow-lg shadow-emerald-500/30 transition flex items-center space-x-2">
+              <i data-lucide="play" class="w-4 h-4 fill-current"></i>
+              <span>Luyện thi theo Domain</span>
+            </button>
+            <button onclick="startMockExam(100)" class="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-medium text-sm backdrop-blur border border-white/15 transition flex items-center space-x-2">
+              <i data-lucide="timer" class="w-4 h-4"></i>
+              <span>Thi thử 100 câu (120 phút)</span>
+            </button>
+            <button onclick="switchTab('study')" class="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-medium text-sm backdrop-blur border border-white/15 transition flex items-center space-x-2">
+              <i data-lucide="book-marked" class="w-4 h-4"></i>
+              <span>Đọc cẩm nang 5 Domain</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Key Learning Metric Cards -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Card 1: Questions Answered -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
+            <span class="text-xs font-semibold uppercase tracking-wider">Tiến độ câu hỏi</span>
+            <div class="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+              <i data-lucide="check-square" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="mt-3 flex items-baseline space-x-2">
+            <span class="text-2xl font-bold" id="statAnswered">0</span>
+            <span class="text-xs text-slate-400">/ 277 câu</span>
+          </div>
+          <div class="mt-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+            <div id="statAnsweredBar" class="bg-blue-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- Card 2: Accuracy Rate -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
+            <span class="text-xs font-semibold uppercase tracking-wider">Tỷ lệ chính xác</span>
+            <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+              <i data-lucide="target" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="mt-3 flex items-baseline space-x-2">
+            <span class="text-2xl font-bold" id="statAccuracy">0%</span>
+            <span class="text-xs text-emerald-600 dark:text-emerald-400 font-medium" id="statAccuracyTag">Chưa có bài thi</span>
+          </div>
+          <div class="mt-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+            <div id="statAccuracyBar" class="bg-emerald-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- Card 3: Exam Readiness Score -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
+            <span class="text-xs font-semibold uppercase tracking-wider">Độ sẵn sàng thi (Pass 70%)</span>
+            <div class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+              <i data-lucide="award" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="mt-3 flex items-baseline space-x-2">
+            <span class="text-2xl font-bold" id="statReadiness">0%</span>
+            <span class="text-xs text-slate-400">Mục tiêu: 85%+</span>
+          </div>
+          <div class="mt-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+            <div id="statReadinessBar" class="bg-amber-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- Card 4: Flashcards Mastered -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
+          <div class="flex items-center justify-between text-slate-500 dark:text-slate-400">
+            <span class="text-xs font-semibold uppercase tracking-wider">Thẻ ghi nhớ thuộc</span>
+            <div class="w-8 h-8 rounded-lg bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+              <i data-lucide="layers" class="w-4 h-4"></i>
+            </div>
+          </div>
+          <div class="mt-3 flex items-baseline space-x-2">
+            <span class="text-2xl font-bold" id="statFlashcardsMastered">0</span>
+            <span class="text-xs text-slate-400">thẻ thành thạo</span>
+          </div>
+          <div class="mt-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+            <div id="statFlashcardsBar" class="bg-purple-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Domain Mastery Section -->
+      <div class="space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-bold">Tiến độ làm chủ 5 Domain ISC2 CC</h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Tỷ lệ hoàn thành câu hỏi và độ chính xác theo từng phân vùng kiến thức</p>
+          </div>
+          <button onclick="resetAllProgress()" class="text-xs text-slate-400 hover:text-red-500 transition flex items-center space-x-1">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+            <span>Đặt lại tiến độ</span>
+          </button>
+        </div>
+
+        <div id="domainCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Filled dynamically by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Quick Action Panels -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-slate-900 dark:to-blue-950/40 p-5 rounded-2xl border border-blue-200/50 dark:border-blue-900/40 flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-md shadow-blue-500/20 mb-3">
+              <i data-lucide="zap" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-bold text-base text-slate-900 dark:text-white">Luyện tập nhanh 10 câu</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">10 câu ngẫu nhiên từ mọi domain giúp củng cố kiến thức trong 5 phút mỗi ngày.</p>
+          </div>
+          <button onclick="startQuickQuiz(10)" class="mt-4 w-full py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl transition shadow">Bắt đầu ngay</button>
+        </div>
+
+        <div class="bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-slate-900 dark:to-emerald-950/40 p-5 rounded-2xl border border-emerald-200/50 dark:border-emerald-900/40 flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shadow-md shadow-emerald-500/20 mb-3">
+              <i data-lucide="repeat" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-bold text-base text-slate-900 dark:text-white">Ôn các câu từng làm sai</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Luyện lại những câu bạn đã trả lời sai trước đây để khắc phục 100% điểm yếu.</p>
+          </div>
+          <button onclick="switchTab('mistakes')" class="mt-4 w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition shadow">Xem danh sách câu sai</button>
+        </div>
+
+        <div class="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-slate-900 dark:to-amber-950/40 p-5 rounded-2xl border border-amber-200/50 dark:border-amber-900/40 flex flex-col justify-between">
+          <div>
+            <div class="w-10 h-10 rounded-xl bg-amber-600 text-white flex items-center justify-center shadow-md shadow-amber-500/20 mb-3">
+              <i data-lucide="table" class="w-5 h-5"></i>
+            </div>
+            <h3 class="font-bold text-base text-slate-900 dark:text-white">Bảng Cheat Sheets & Port</h3>
+            <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">7 bảng tra cứu kinh điển: OSI, Port, Phục hồi thảm họa, Kiểm soát truy cập, Mã hóa.</p>
+          </div>
+          <button onclick="switchTab('study')" class="mt-4 w-full py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-semibold rounded-xl transition shadow">Tra cứu bảng biểu</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: DOMAIN PRACTICE (LUYỆN THEO DOMAIN) -->
+    <!-- ========================================== -->
+    <div id="tab-practice" class="tab-content space-y-6">
+      <!-- Domain Filter Bar -->
+      <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center space-x-2 w-full sm:w-auto">
+          <label class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 whitespace-nowrap">Chọn Domain:</label>
+          <select id="practiceDomainSelect" onchange="filterPracticeDomain()" class="w-full sm:w-80 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-100 rounded-xl px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-emerald-500 outline-none">
+            <option value="0">Tất cả các Domain (277 câu)</option>
+            <option value="1">Domain 1: Security Principles (49 câu)</option>
+            <option value="2">Domain 2: BCP, DRP & Incident Response (43 câu)</option>
+            <option value="3">Domain 3: Access Control Concepts (30 câu)</option>
+            <option value="4">Domain 4: Network Security (124 câu)</option>
+            <option value="5">Domain 5: Security Operations (31 câu)</option>
+          </select>
+        </div>
+
+        <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+          <button onclick="togglePracticeMode('sequential')" id="btnSequential" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300">Tuần tự</button>
+          <button onclick="togglePracticeMode('random')" id="btnRandom" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800">Ngẫu nhiên</button>
+          <span class="text-slate-300 dark:text-slate-700">|</span>
+          <span id="practiceProgressCounter" class="text-xs font-medium text-slate-500 dark:text-slate-400">Câu 1 / 277</span>
+        </div>
+      </div>
+
+      <!-- Question Card Container -->
+      <div id="practiceQuestionCard" class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-md p-6 sm:p-8 space-y-6">
+        <!-- Rendered dynamically by JavaScript -->
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 3: MOCK EXAM (THI THỬ MÔ PHỎNG) -->
+    <!-- ========================================== -->
+    <div id="tab-exam" class="tab-content space-y-6">
+      
+      <!-- Exam Config Screen (Before starting) -->
+      <div id="examConfigScreen" class="max-w-2xl mx-auto bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-200 dark:border-slate-800 shadow-xl space-y-6 text-center">
+        <div class="w-16 h-16 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center shadow-lg shadow-emerald-500/10">
+          <i data-lucide="timer" class="w-8 h-8"></i>
+        </div>
+        <div>
+          <h2 class="text-2xl font-extrabold">Mô phỏng kỳ thi thật ISC2 CC</h2>
+          <p class="text-sm text-slate-500 dark:text-slate-400 mt-2 max-w-lg mx-auto">
+            Hệ thống trích chọn câu hỏi ngẫu nhiên được cân bằng theo đúng tỷ lệ trọng số 5 Domain của kỳ thi Certified in Cybersecurity.
+          </p>
+        </div>
+
+        <!-- Exam Parameters Info -->
+        <div class="grid grid-cols-3 gap-3 p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl text-left border border-slate-200/60 dark:border-slate-700/60">
+          <div>
+            <span class="text-[11px] font-semibold text-slate-400 uppercase">Thời gian</span>
+            <div class="text-sm font-bold mt-0.5">120 Phút</div>
+          </div>
+          <div>
+            <span class="text-[11px] font-semibold text-slate-400 uppercase">Số câu hỏi</span>
+            <div class="text-sm font-bold mt-0.5">100 Câu trắc nghiệm</div>
+          </div>
+          <div>
+            <span class="text-[11px] font-semibold text-slate-400 uppercase">Điểm đạt (Pass)</span>
+            <div class="text-sm font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">700 / 1000 (70%)</div>
+          </div>
+        </div>
+
+        <div class="space-y-3 pt-2">
+          <button onclick="startMockExam(100)" class="w-full py-3.5 px-6 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg shadow-emerald-600/30 transition flex items-center justify-center space-x-2">
+            <i data-lucide="play" class="w-5 h-5 fill-current"></i>
+            <span>Bắt đầu bài thi đầy đủ 100 câu (120 phút)</span>
+          </button>
+          <div class="flex items-center space-x-3">
+            <button onclick="startMockExam(50)" class="flex-1 py-2.5 px-4 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold transition">
+              Thi rút gọn 50 câu (60 phút)
+            </button>
+            <button onclick="startMockExam(25)" class="flex-1 py-2.5 px-4 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold transition">
+              Thi nhanh 25 câu (30 phút)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Exam Active Arena -->
+      <div id="examActiveArena" class="hidden space-y-6">
+        <!-- Exam Top Status Bar -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl p-4 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4 sticky top-20 z-30">
+          <div class="flex items-center space-x-3">
+            <div class="px-3 py-1 bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs font-bold">
+              ISC2 CC MOCK EXAM
+            </div>
+            <span id="examCurrentQuestionNumber" class="text-sm font-semibold">Câu 1 / 100</span>
+          </div>
+
+          <!-- Timer Clock -->
+          <div class="flex items-center space-x-2 px-4 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-xl font-mono text-base font-bold" id="examTimerDisplay">
+            <i data-lucide="clock" class="w-4 h-4 text-emerald-500 animate-pulse"></i>
+            <span id="examTimeRemaining">120:00</span>
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <button onclick="toggleExamFlag()" id="btnExamFlag" class="px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-medium flex items-center space-x-1">
+              <i data-lucide="flag" class="w-3.5 h-3.5"></i>
+              <span>Gắn cờ xem lại</span>
+            </button>
+            <button onclick="confirmSubmitExam()" class="px-4 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-bold shadow transition">
+              Nộp bài
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <!-- Question Body (3 Cols) -->
+          <div class="lg:col-span-3">
+            <div id="examQuestionContainer" class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-md p-6 sm:p-8 space-y-6">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- Question Grid Navigator (1 Col) -->
+          <div class="lg:col-span-1 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-4 space-y-4">
+            <div class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-400">
+              <span>Bảng câu hỏi</span>
+              <span id="examAnsweredCount">0/100</span>
+            </div>
+            <div id="examQuestionGrid" class="grid grid-cols-5 sm:grid-cols-10 lg:grid-cols-5 gap-1.5 max-h-96 overflow-y-auto pr-1">
+              <!-- Rendered dynamically -->
+            </div>
+            <div class="pt-2 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-2 text-[11px] text-slate-500">
+              <div class="flex items-center space-x-1.5">
+                <span class="w-3 h-3 rounded bg-emerald-500 inline-block"></span>
+                <span>Đã trả lời</span>
+              </div>
+              <div class="flex items-center space-x-1.5">
+                <span class="w-3 h-3 rounded bg-amber-400 inline-block"></span>
+                <span>Gắn cờ</span>
+              </div>
+              <div class="flex items-center space-x-1.5">
+                <span class="w-3 h-3 rounded bg-slate-200 dark:bg-slate-700 inline-block"></span>
+                <span>Chưa làm</span>
+              </div>
+              <div class="flex items-center space-x-1.5">
+                <span class="w-3 h-3 rounded ring-2 ring-emerald-500 inline-block"></span>
+                <span>Đang chọn</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Exam Result Screen (After Submitting) -->
+      <div id="examResultScreen" class="hidden space-y-8">
+        <!-- Rendered dynamically by JavaScript -->
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 4: FLASHCARDS (THẺ GHI NHỚ) -->
+    <!-- ========================================== -->
+    <div id="tab-flashcards" class="tab-content space-y-6">
+      
+      <!-- Flashcard Controls -->
+      <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center space-x-2 w-full sm:w-auto">
+          <label class="text-xs font-bold uppercase text-slate-400 whitespace-nowrap">Lọc:</label>
+          <select id="flashcardDomainSelect" onchange="filterFlashcards()" class="w-full sm:w-72 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-1.5 text-xs font-medium">
+            <option value="0">Tất cả Domain</option>
+            <option value="1">Domain 1: Security Principles</option>
+            <option value="2">Domain 2: BCDR & IR</option>
+            <option value="3">Domain 3: Access Control</option>
+            <option value="4">Domain 4: Network Security</option>
+            <option value="5">Domain 5: Security Operations</option>
+          </select>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <button onclick="shuffleFlashcards()" class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center space-x-1">
+            <i data-lucide="shuffle" class="w-3.5 h-3.5"></i>
+            <span>Đảo ngẫu nhiên</span>
+          </button>
+          <span id="flashcardIndexText" class="text-xs font-semibold text-slate-500">Thẻ 1 / 277</span>
+        </div>
+      </div>
+
+      <!-- Flashcard 3D Card Interactive Display -->
+      <div class="max-w-2xl mx-auto perspective-1000 py-4">
+        <div id="flashcardElement" onclick="flipFlashcard()" class="relative w-full min-h-[360px] cursor-pointer transform-style-3d transition-transform duration-500 rounded-3xl shadow-xl">
+          
+          <!-- Front Face (Question) -->
+          <div id="flashcardFront" class="absolute inset-0 backface-hidden bg-white dark:bg-slate-900 rounded-3xl p-8 border-2 border-slate-200 dark:border-slate-800 flex flex-col justify-between shadow-lg">
+            <div>
+              <div class="flex items-center justify-between text-xs">
+                <span id="fcDomainBadge" class="px-2.5 py-1 rounded-full font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">Domain 1</span>
+                <span id="fcPageBadge" class="text-slate-400">Trang 40</span>
+              </div>
+              <div class="mt-8 text-center">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">CÂU HỎI THI THẬT</span>
+                <h3 id="fcQuestionText" class="text-xl sm:text-2xl font-bold mt-4 text-slate-800 dark:text-slate-100 leading-snug">
+                  What are the three most common goals of cybersecurity attackers?
+                </h3>
+              </div>
+            </div>
+
+            <div class="text-center pt-6 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-400 flex items-center justify-center space-x-1">
+              <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
+              <span>Click chuột hoặc nhấn <b>Space</b> để xem đáp án</span>
+            </div>
+          </div>
+
+          <!-- Back Face (Answer & Explanation) -->
+          <div id="flashcardBack" class="absolute inset-0 backface-hidden rotate-y-180 bg-gradient-to-br from-emerald-900 via-slate-900 to-slate-950 text-white rounded-3xl p-8 border-2 border-emerald-500/40 flex flex-col justify-between shadow-2xl">
+            <div>
+              <div class="flex items-center justify-between text-xs">
+                <span class="px-2.5 py-1 rounded-full font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">ĐÁP ÁN CHÍNH XÁC</span>
+                <span id="fcBackTopic" class="text-slate-300 text-xs font-semibold">CIA Triad</span>
+              </div>
+              <div class="mt-6">
+                <div id="fcAnswerText" class="text-xl sm:text-2xl font-extrabold text-emerald-400">
+                  Disclosure, alteration, and denial
+                </div>
+                <div class="mt-4 p-4 rounded-xl bg-white/5 border border-white/10 text-xs sm:text-sm text-slate-300 leading-relaxed" id="fcExplanationText">
+                  Bộ ba mục tiêu tiêu cực (DAD) của tin tặc là mặt đối nghịch trực tiếp của bộ ba bảo mật CIA (Confidentiality, Integrity, Availability).
+                </div>
+              </div>
+            </div>
+
+            <div class="text-center pt-4 border-t border-white/10 text-xs text-slate-400 flex items-center justify-center space-x-1">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+              <span>Click để lật lại câu hỏi</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Flashcard Bottom Action Buttons -->
+      <div class="max-w-2xl mx-auto flex items-center justify-between gap-3">
+        <button onclick="prevFlashcard()" class="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          <i data-lucide="arrow-left" class="w-5 h-5"></i>
+        </button>
+
+        <div class="flex items-center space-x-2">
+          <button onclick="markFlashcardStatus('struggling')" class="px-4 py-2 rounded-xl bg-red-100 dark:bg-red-950/60 text-red-700 dark:text-red-300 text-xs font-semibold hover:bg-red-200 transition">
+            Chưa thuộc (Phím 1)
+          </button>
+          <button onclick="markFlashcardStatus('learning')" class="px-4 py-2 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 text-xs font-semibold hover:bg-amber-200 transition">
+            Đang nhớ (Phím 2)
+          </button>
+          <button onclick="markFlashcardStatus('mastered')" class="px-4 py-2 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 text-xs font-semibold hover:bg-emerald-200 transition">
+            Đã thuộc (Phím 3)
+          </button>
+        </div>
+
+        <button onclick="nextFlashcard()" class="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+          <i data-lucide="arrow-right" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 5: STUDY NOTES & CHEAT SHEETS -->
+    <!-- ========================================== -->
+    <div id="tab-study" class="tab-content space-y-8">
+      
+      <!-- Domain Summaries Selector -->
+      <div class="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-wrap items-center gap-2">
+        <span class="text-xs font-bold uppercase text-slate-400 mr-2">Chọn Domain:</span>
+        <button onclick="selectStudyDomain(1)" class="study-domain-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-600 text-white shadow" data-d="1">Domain 1 (26%)</button>
+        <button onclick="selectStudyDomain(2)" class="study-domain-btn px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800" data-d="2">Domain 2 (10%)</button>
+        <button onclick="selectStudyDomain(3)" class="study-domain-btn px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800" data-d="3">Domain 3 (22%)</button>
+        <button onclick="selectStudyDomain(4)" class="study-domain-btn px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800" data-d="4">Domain 4 (24%)</button>
+        <button onclick="selectStudyDomain(5)" class="study-domain-btn px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800" data-d="5">Domain 5 (18%)</button>
+        <button onclick="showCheatSheetsOnly()" class="study-domain-btn px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40" data-d="cheatsheet">⚡ Bảng Cheat Sheet</button>
+      </div>
+
+      <!-- Domain Study Content Container -->
+      <div id="studyContentContainer" class="space-y-8">
+        <!-- Rendered dynamically by JavaScript -->
+      </div>
+
+      <!-- Reference Tables & Cheat Sheets Container -->
+      <div id="cheatSheetsContainer" class="space-y-8">
+        <h2 class="text-xl font-bold border-b border-slate-200 dark:border-slate-800 pb-3 flex items-center space-x-2">
+          <i data-lucide="table" class="w-5 h-5 text-amber-500"></i>
+          <span>7 Bảng Tra Cứu Cheat Sheet Kinh Điển Trong Sách</span>
+        </h2>
+        <div id="referenceTablesList" class="space-y-6">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 6: GLOSSARY & ACRONYMS -->
+    <!-- ========================================== -->
+    <div id="tab-glossary" class="tab-content space-y-6">
+      
+      <!-- Glossary Header & Search Bar -->
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+        <div>
+          <h2 class="text-xl font-bold">Từ điển thuật ngữ & Viết tắt (Cybersecurity Acronyms)</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Các từ viết tắt và khái niệm cốt lõi thường xuyên xuất hiện trong bài thi ISC2 Certified in Cybersecurity.</p>
+        </div>
+
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-3 text-slate-400"></i>
+          <input type="text" id="glossarySearchInput" oninput="filterGlossary()" placeholder="Tìm kiếm thuật ngữ hoặc từ viết tắt (Ví dụ: CIA, MFA, RTO, AES, SIEM, DNS...)" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+        </div>
+      </div>
+
+      <!-- Glossary Term Cards Grid -->
+      <div id="glossaryGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Rendered dynamically by JavaScript -->
+      </div>
+
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 7: MISTAKES & BOOKMARKS -->
+    <!-- ========================================== -->
+    <div id="tab-mistakes" class="tab-content space-y-6">
+      <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div>
+          <h2 class="text-xl font-bold">Danh sách câu hỏi cần ôn lại</h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Tập hợp các câu bạn từng trả lời sai hoặc đã gắn dấu sao ghi nhớ.</p>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <button onclick="startMistakesQuiz()" id="btnStartMistakesQuiz" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow disabled:opacity-50">
+            Luyện tập riêng các câu này
+          </button>
+          <button onclick="clearMistakesList()" class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-slate-400 hover:text-red-500 transition">
+            Xóa danh sách
+          </button>
+        </div>
+      </div>
+
+      <div id="mistakesListContainer" class="space-y-4">
+        <!-- Rendered dynamically by JavaScript -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-4 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-400">
+      Ứng dụng học tập chuẩn bị cho kỳ thi ISC2 Certified in Cybersecurity (CC) • Tác giả nội dung: Certified in Cybersecurity (CC) Exam Guide
+    </div>
+  </footer>
+
+  <!-- Main Application Logic Script -->
+  <script>
+    // Global Application State
+    let APP_DATA = {
+      questions: [],
+      domains: [],
+      reference_tables: [],
+      glossary: [],
+      domain_summaries: []
+    };
+
+    // User Progress State (Persisted in LocalStorage)
+    let userState = {
+      answeredCount: 0,
+      correctCount: 0,
+      answeredQuestions: {}, // { qId: { chosen: 'A', correct: true/false, timestamp: ... } }
+      bookmarkedQuestions: [], // [ qId, ... ]
+      mistakeQuestions: [], // [ qId, ... ]
+      flashcardsMastery: {}, // { qId: 'struggling' | 'learning' | 'mastered' }
+      mockExamsHistory: []
+    };
+
+    // Current views state
+    let practiceState = {
+      filteredQuestions: [],
+      currentIndex: 0,
+      mode: 'sequential', // 'sequential' | 'random'
+      domainId: 0
+    };
+
+    let examState = {
+      active: false,
+      totalQuestions: 100,
+      questions: [],
+      userAnswers: {}, // { qId: 'A' }
+      flagged: {}, // { qId: true }
+      currentQuestionIdx: 0,
+      timerSeconds: 120 * 60,
+      timerInterval: null
+    };
+
+    let flashcardState = {
+      filteredCards: [],
+      currentIndex: 0,
+      isFlipped: false
+    };
+
+    // 1. Initial Load & Hydration
+    async function initApp() {
+      loadUserState();
+
+      try {
+        let response = await fetch('/api/data');
+        if (!response.ok) {
+          response = await fetch('./isc2_data.json');
+        }
+        APP_DATA = await response.json();
+      } catch (err) {
+        console.warn("Could not fetch from /api/data, checking local fallback...", err);
+        try {
+          const fallback = await fetch('./isc2_data.json');
+          APP_DATA = await fallback.json();
+        } catch (e2) {
+          console.error("Critical: Could not load ISC2 data", e2);
+        }
+      }
+
+      // Update counters in UI
+      const totalQ = APP_DATA.questions ? APP_DATA.questions.length : 277;
+      document.getElementById('totalQuestionsCount').innerText = totalQ;
+
+      // Initialize sections
+      renderDashboard();
+      initPractice();
+      initFlashcards();
+      initStudy();
+      initGlossary();
+      renderMistakes();
+
+      // Render Lucide icons
+      lucide.createIcons();
+
+      // Setup Keyboard shortcuts
+      window.addEventListener('keydown', handleGlobalKeydown);
+    }
+
+    // LocalStorage helper
+    function loadUserState() {
+      const saved = localStorage.getItem('isc2_cc_user_state');
+      if (saved) {
+        try {
+          userState = Object.assign(userState, JSON.parse(saved));
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+
+    function saveUserState() {
+      localStorage.setItem('isc2_cc_user_state', JSON.stringify(userState));
+      updateDashboardStats();
+    }
+
+    function resetAllProgress() {
+      if (confirm("Bạn có chắc chắn muốn đặt lại toàn bộ tiến độ học tập và lịch sử câu hỏi không?")) {
+        userState = {
+          answeredCount: 0,
+          correctCount: 0,
+          answeredQuestions: {},
+          bookmarkedQuestions: [],
+          mistakeQuestions: [],
+          flashcardsMastery: {},
+          mockExamsHistory: []
+        };
+        saveUserState();
+        renderDashboard();
+        initPractice();
+        renderMistakes();
+        alert("Đã đặt lại toàn bộ tiến độ!");
+      }
+    }
+
+    // Tab Switching
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      const target = document.getElementById('tab-' + tabId);
+      if (target) target.classList.add('active');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        if (btn.getAttribute('data-tab') === tabId) {
+          btn.className = "nav-btn px-3 py-2 rounded-lg text-sm font-medium flex items-center space-x-1.5 transition-all text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50";
+        } else {
+          btn.className = "nav-btn px-3 py-2 rounded-lg text-sm font-medium flex items-center space-x-1.5 transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800";
+        }
+      });
+
+      if (tabId === 'dashboard') updateDashboardStats();
+      if (tabId === 'mistakes') renderMistakes();
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      lucide.createIcons();
+    }
+
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobileMenu');
+      menu.classList.toggle('hidden');
+    }
+
+    function toggleDarkMode() {
+      const html = document.documentElement;
+      const icon = document.getElementById('themeIcon');
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        icon.setAttribute('data-lucide', 'moon');
+        localStorage.setItem('theme', 'light');
+      } else {
+        html.classList.add('dark');
+        icon.setAttribute('data-lucide', 'sun');
+        localStorage.setItem('theme', 'dark');
+      }
+      lucide.createIcons();
+    }
+
+    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+
+    // 2. DASHBOARD RENDERING
+    function renderDashboard() {
+      updateDashboardStats();
+
+      // Render 5 Domain cards
+      const container = document.getElementById('domainCardsContainer');
+      container.innerHTML = '';
+
+      if (!APP_DATA.domains) return;
+
+      APP_DATA.domains.forEach(d => {
+        const domainQuestions = APP_DATA.questions.filter(q => q.domain_id === d.id);
+        const answeredInDomain = domainQuestions.filter(q => userState.answeredQuestions[q.id]);
+        const correctInDomain = answeredInDomain.filter(q => userState.answeredQuestions[q.id].correct);
+
+        const totalQ = domainQuestions.length;
+        const answeredCount = answeredInDomain.length;
+        const progressPct = totalQ > 0 ? Math.round((answeredCount / totalQ) * 100) : 0;
+        const accuracyPct = answeredCount > 0 ? Math.round((correctInDomain.length / answeredCount) * 100) : 0;
+
+        const card = document.createElement('div');
+        card.className = "bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between hover:border-emerald-500/50 transition";
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+                ${d.weight} đề thi
+              </span>
+              <span class="text-xs text-slate-400">${totalQ} câu hỏi</span>
+            </div>
+            <h3 class="font-bold text-base mt-2 text-slate-800 dark:text-slate-100">${d.name_vi}</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">${d.description_vi}</p>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
+            <div class="flex justify-between text-xs text-slate-500 mb-1">
+              <span>Đã làm: ${answeredCount}/${totalQ}</span>
+              <span class="font-semibold text-emerald-600 dark:text-emerald-400">${accuracyPct}% đúng</span>
+            </div>
+            <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 overflow-hidden">
+              <div class="bg-emerald-500 h-1.5 rounded-full" style="width: ${progressPct}%"></div>
+            </div>
+            <div class="mt-4 flex items-center space-x-2">
+              <button onclick="startDomainPractice(${d.id})" class="flex-1 py-1.5 bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 text-emerald-700 dark:text-emerald-300 rounded-lg text-xs font-semibold transition text-center">
+                Luyện câu hỏi
+              </button>
+              <button onclick="viewDomainStudy(${d.id})" class="px-2.5 py-1.5 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-xs text-slate-600 dark:text-slate-300 transition" title="Đọc lý thuyết">
+                <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    function updateDashboardStats() {
+      const totalQ = APP_DATA.questions ? APP_DATA.questions.length : 277;
+      const answeredKeys = Object.keys(userState.answeredQuestions);
+      const answeredCount = answeredKeys.length;
+      const correctCount = answeredKeys.filter(id => userState.answeredQuestions[id].correct).length;
+      const accuracyPct = answeredCount > 0 ? Math.round((correctCount / answeredCount) * 100) : 0;
+
+      // Flashcards mastered count
+      const masteredCount = Object.values(userState.flashcardsMastery).filter(v => v === 'mastered').length;
+
+      // Readiness score calculation
+      // Weighted: 40% completion + 60% accuracy
+      const completionRate = totalQ > 0 ? (answeredCount / totalQ) : 0;
+      const readinessScore = Math.round((completionRate * 0.4 + (accuracyPct / 100) * 0.6) * 100);
+
+      document.getElementById('statAnswered').innerText = answeredCount;
+      document.getElementById('statAnsweredBar').style.width = Math.min(100, Math.round((answeredCount / totalQ) * 100)) + '%';
+
+      document.getElementById('statAccuracy').innerText = accuracyPct + '%';
+      document.getElementById('statAccuracyBar').style.width = accuracyPct + '%';
+      if (answeredCount > 0) {
+        document.getElementById('statAccuracyTag').innerText = accuracyPct >= 70 ? '✓ Đạt chuẩn Pass' : '⚠️ Cần cải thiện';
+        document.getElementById('statAccuracyTag').className = accuracyPct >= 70 ? 'text-xs text-emerald-600 font-semibold' : 'text-xs text-amber-500 font-semibold';
+      }
+
+      document.getElementById('statReadiness').innerText = readinessScore + '%';
+      document.getElementById('statReadinessBar').style.width = readinessScore + '%';
+
+      document.getElementById('statFlashcardsMastered').innerText = masteredCount;
+      document.getElementById('statFlashcardsBar').style.width = Math.min(100, Math.round((masteredCount / totalQ) * 100)) + '%';
+
+      // Update mistake badge in header
+      const mistakeBadge = document.getElementById('mistakeBadge');
+      const mistakeCount = userState.mistakeQuestions.length;
+      if (mistakeCount > 0) {
+        mistakeBadge.innerText = mistakeCount;
+        mistakeBadge.classList.remove('hidden');
+      } else {
+        mistakeBadge.classList.add('hidden');
+      }
+    }
+
+    // 3. DOMAIN PRACTICE LOGIC
+    function initPractice() {
+      practiceState.filteredQuestions = [...(APP_DATA.questions || [])];
+      practiceState.currentIndex = 0;
+      renderPracticeQuestion();
+    }
+
+    function startDomainPractice(domainId) {
+      practiceState.domainId = domainId;
+      document.getElementById('practiceDomainSelect').value = domainId;
+      filterPracticeDomain();
+      switchTab('practice');
+    }
+
+    function filterPracticeDomain() {
+      const dId = parseInt(document.getElementById('practiceDomainSelect').value);
+      practiceState.domainId = dId;
+
+      if (dId === 0) {
+        practiceState.filteredQuestions = [...APP_DATA.questions];
+      } else {
+        practiceState.filteredQuestions = APP_DATA.questions.filter(q => q.domain_id === dId);
+      }
+
+      if (practiceState.mode === 'random') {
+        shuffleArray(practiceState.filteredQuestions);
+      }
+
+      practiceState.currentIndex = 0;
+      renderPracticeQuestion();
+    }
+
+    function togglePracticeMode(mode) {
+      practiceState.mode = mode;
+      if (mode === 'random') {
+        document.getElementById('btnRandom').className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300";
+        document.getElementById('btnSequential').className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800";
+        shuffleArray(practiceState.filteredQuestions);
+      } else {
+        document.getElementById('btnSequential').className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300";
+        document.getElementById('btnRandom').className = "px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800";
+        filterPracticeDomain();
+      }
+      practiceState.currentIndex = 0;
+      renderPracticeQuestion();
+    }
+
+    function renderPracticeQuestion() {
+      const container = document.getElementById('practiceQuestionCard');
+      const list = practiceState.filteredQuestions;
+
+      if (!list || list.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-12">
+            <i data-lucide="help-circle" class="w-12 h-12 text-slate-300 mx-auto mb-3"></i>
+            <h3 class="font-bold text-lg">Không tìm thấy câu hỏi</h3>
+            <p class="text-xs text-slate-500 mt-1">Vui lòng chọn lại bộ lọc domain khác.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      const q = list[practiceState.currentIndex];
+      const totalInFilter = list.length;
+      document.getElementById('practiceProgressCounter').innerText = `Câu ${practiceState.currentIndex + 1} / ${totalInFilter}`;
+
+      const isBookmarked = userState.bookmarkedQuestions.includes(q.id);
+      const savedAnswer = userState.answeredQuestions[q.id];
+
+      container.innerHTML = `
+        <div>
+          <!-- Header Badges -->
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+                ${q.domain_name_vi || q.domain_name}
+              </span>
+              <span class="text-xs text-slate-400">Trang ${q.page}</span>
+              <span class="text-xs font-medium text-slate-400 hidden sm:inline">• ${q.topic}</span>
+            </div>
+            
+            <button onclick="toggleBookmark(${q.id})" class="p-2 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-400 hover:text-amber-500 transition" title="Ghi nhớ câu này">
+              <i data-lucide="bookmark" class="w-4 h-4 ${isBookmarked ? 'fill-amber-400 text-amber-500' : ''}"></i>
+            </button>
+          </div>
+
+          <!-- Question Prompt -->
+          <div class="mt-4">
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">CÂU HỎI #${q.id}</span>
+            <h2 class="text-lg sm:text-xl font-bold mt-2 text-slate-900 dark:text-white leading-relaxed">
+              ${q.question}
+            </h2>
+          </div>
+        </div>
+
+        <!-- Multiple Choice Options -->
+        <div class="space-y-3" id="practiceOptionsList">
+          ${q.options.map((opt, idx) => {
+            const letter = String.fromCharCode(65 + idx);
+            let optionClass = "border-slate-200 dark:border-slate-700 hover:border-emerald-500 hover:bg-slate-50 dark:hover:bg-slate-800/60";
+            let iconMarkup = `<span class="w-7 h-7 rounded-lg border border-slate-300 dark:border-slate-600 flex items-center justify-center font-bold text-xs text-slate-600 dark:text-slate-300 group-hover:border-emerald-500 group-hover:text-emerald-600">${letter}</span>`;
+
+            // If already answered
+            if (savedAnswer) {
+              const isCorrect = (opt.trim().toLowerCase() === q.correct_answer.trim().toLowerCase());
+              const wasSelected = (savedAnswer.chosen === letter);
+
+              if (isCorrect) {
+                optionClass = "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 font-semibold";
+                iconMarkup = `<span class="w-7 h-7 rounded-lg bg-emerald-500 text-white flex items-center justify-center font-bold text-xs"><i data-lucide="check" class="w-4 h-4"></i></span>`;
+              } else if (wasSelected && !isCorrect) {
+                optionClass = "border-red-500 bg-red-50 dark:bg-red-950/40 text-red-900 dark:text-red-200";
+                iconMarkup = `<span class="w-7 h-7 rounded-lg bg-red-500 text-white flex items-center justify-center font-bold text-xs"><i data-lucide="x" class="w-4 h-4"></i></span>`;
+              }
+            }
+
+            return `
+              <div onclick="selectPracticeOption(${q.id}, '${letter}', '${escapeHtml(opt)}')" class="group p-4 rounded-xl border-2 transition cursor-pointer flex items-center space-x-3.5 ${optionClass}">
+                ${iconMarkup}
+                <span class="text-sm font-medium leading-relaxed">${opt}</span>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <!-- Explanation Card (Visible if answered) -->
+        <div id="practiceExplanationBox" class="${savedAnswer ? '' : 'hidden'} p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 space-y-2">
+          <div class="flex items-center space-x-2 text-xs font-bold text-emerald-600 dark:text-emerald-400">
+            <i data-lucide="lightbulb" class="w-4 h-4"></i>
+            <span>ĐÁP ÁN ĐÚNG: ${q.correct_answer}</span>
+          </div>
+          <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+            ${q.explanation}
+          </p>
+          <div class="pt-2 flex items-center justify-between text-xs text-slate-400">
+            <span>Tham chiếu: Sách Certified in Cybersecurity (CC) Exam Guide, Trang ${q.page}</span>
+            <a href="/api/pdf" target="_blank" class="text-emerald-600 dark:text-emerald-400 hover:underline flex items-center space-x-1">
+              <span>Xem trang ${q.page} trong PDF</span>
+              <i data-lucide="external-link" class="w-3 h-3"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Bottom Navigation Buttons -->
+        <div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <button onclick="prevPracticeQuestion()" ${practiceState.currentIndex === 0 ? 'disabled' : ''} class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-semibold flex items-center space-x-2 disabled:opacity-40 transition">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            <span>Câu trước</span>
+          </button>
+
+          <span class="text-xs text-slate-400">Phím tắt: 1, 2, 3, 4 để chọn • Mũi tên để chuyển câu</span>
+
+          <button onclick="nextPracticeQuestion()" ${practiceState.currentIndex >= totalInFilter - 1 ? 'disabled' : ''} class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold flex items-center space-x-2 disabled:opacity-40 transition shadow">
+            <span>Câu tiếp theo</span>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      `;
+
+      lucide.createIcons();
+    }
+
+    function selectPracticeOption(qId, letter, optText) {
+      const q = APP_DATA.questions.find(item => item.id === qId);
+      if (!q) return;
+
+      const isCorrect = (optText.trim().toLowerCase() === q.correct_answer.trim().toLowerCase());
+
+      userState.answeredQuestions[qId] = {
+        chosen: letter,
+        correct: isCorrect,
+        timestamp: Date.now()
+      };
+
+      if (!isCorrect) {
+        if (!userState.mistakeQuestions.includes(qId)) {
+          userState.mistakeQuestions.push(qId);
+        }
+      } else {
+        // remove from mistakes if answered correctly
+        userState.mistakeQuestions = userState.mistakeQuestions.filter(id => id !== qId);
+      }
+
+      saveUserState();
+      renderPracticeQuestion();
+    }
+
+    function nextPracticeQuestion() {
+      if (practiceState.currentIndex < practiceState.filteredQuestions.length - 1) {
+        practiceState.currentIndex++;
+        renderPracticeQuestion();
+        window.scrollTo({ top: 120, behavior: 'smooth' });
+      }
+    }
+
+    function prevPracticeQuestion() {
+      if (practiceState.currentIndex > 0) {
+        practiceState.currentIndex--;
+        renderPracticeQuestion();
+        window.scrollTo({ top: 120, behavior: 'smooth' });
+      }
+    }
+
+    function toggleBookmark(qId) {
+      const idx = userState.bookmarkedQuestions.indexOf(qId);
+      if (idx >= 0) {
+        userState.bookmarkedQuestions.splice(idx, 1);
+      } else {
+        userState.bookmarkedQuestions.push(qId);
+      }
+      saveUserState();
+      renderPracticeQuestion();
+    }
+
+    // 4. FULL MOCK EXAM SIMULATOR
+    function startMockExam(totalCount) {
+      examState.active = true;
+      examState.totalQuestions = totalCount;
+      examState.userAnswers = {};
+      examState.flagged = {};
+      examState.currentQuestionIdx = 0;
+      examState.timerSeconds = totalCount === 100 ? 120 * 60 : (totalCount === 50 ? 60 * 60 : 30 * 60);
+
+      // Generate weighted random questions based on ISC2 domains
+      // Domain 1: 26%, Domain 2: 10%, Domain 3: 22%, Domain 4: 24%, Domain 5: 18%
+      const poolD1 = APP_DATA.questions.filter(q => q.domain_id === 1);
+      const poolD2 = APP_DATA.questions.filter(q => q.domain_id === 2);
+      const poolD3 = APP_DATA.questions.filter(q => q.domain_id === 3);
+      const poolD4 = APP_DATA.questions.filter(q => q.domain_id === 4);
+      const poolD5 = APP_DATA.questions.filter(q => q.domain_id === 5);
+
+      const count1 = Math.round(totalCount * 0.26);
+      const count2 = Math.round(totalCount * 0.10);
+      const count3 = Math.round(totalCount * 0.22);
+      const count4 = Math.round(totalCount * 0.24);
+      const count5 = totalCount - (count1 + count2 + count3 + count4);
+
+      shuffleArray(poolD1);
+      shuffleArray(poolD2);
+      shuffleArray(poolD3);
+      shuffleArray(poolD4);
+      shuffleArray(poolD5);
+
+      const examQuestions = [
+        ...poolD1.slice(0, count1),
+        ...poolD2.slice(0, count2),
+        ...poolD3.slice(0, count3),
+        ...poolD4.slice(0, count4),
+        ...poolD5.slice(0, count5)
+      ];
+
+      shuffleArray(examQuestions);
+      examState.questions = examQuestions;
+
+      // Switch screens
+      document.getElementById('examConfigScreen').classList.add('hidden');
+      document.getElementById('examResultScreen').classList.add('hidden');
+      document.getElementById('examActiveArena').classList.remove('hidden');
+
+      // Start Countdown Timer
+      if (examState.timerInterval) clearInterval(examState.timerInterval);
+      examState.timerInterval = setInterval(updateExamTimer, 1000);
+      updateExamTimer();
+
+      renderExamCurrentQuestion();
+      renderExamQuestionGrid();
+      switchTab('exam');
+    }
+
+    function updateExamTimer() {
+      if (examState.timerSeconds <= 0) {
+        clearInterval(examState.timerInterval);
+        alert("Hết giờ làm bài! Hệ thống sẽ tự động nộp bài thi của bạn.");
+        submitExam();
+        return;
+      }
+
+      examState.timerSeconds--;
+      const minutes = Math.floor(examState.timerSeconds / 60);
+      const seconds = examState.timerSeconds % 60;
+      const formatted = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      
+      const timerDisplay = document.getElementById('examTimeRemaining');
+      if (timerDisplay) {
+        timerDisplay.innerText = formatted;
+        if (examState.timerSeconds < 300) {
+          timerDisplay.parentElement.className = "flex items-center space-x-2 px-4 py-1.5 bg-red-100 dark:bg-red-950 text-red-600 rounded-xl font-mono text-base font-bold animate-pulse";
+        }
+      }
+    }
+
+    function renderExamCurrentQuestion() {
+      const q = examState.questions[examState.currentQuestionIdx];
+      if (!q) return;
+
+      document.getElementById('examCurrentQuestionNumber').innerText = `Câu ${examState.currentQuestionIdx + 1} / ${examState.totalQuestions}`;
+
+      const isFlagged = examState.flagged[q.id];
+      const flagBtn = document.getElementById('btnExamFlag');
+      if (isFlagged) {
+        flagBtn.className = "px-3 py-1.5 rounded-lg bg-amber-100 dark:bg-amber-950 text-amber-600 font-semibold border border-amber-300 text-xs flex items-center space-x-1";
+      } else {
+        flagBtn.className = "px-3 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-medium flex items-center space-x-1";
+      }
+
+      const selectedLetter = examState.userAnswers[q.id];
+
+      const container = document.getElementById('examQuestionContainer');
+      container.innerHTML = `
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+              ${q.domain_name_vi || q.domain_name}
+            </span>
+            ${isFlagged ? '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-700">Đã gắn cờ</span>' : ''}
+          </div>
+          <h2 class="text-lg sm:text-xl font-bold mt-4 text-slate-900 dark:text-white leading-relaxed">
+            ${q.question}
+          </h2>
+        </div>
+
+        <div class="space-y-3">
+          ${q.options.map((opt, idx) => {
+            const letter = String.fromCharCode(65 + idx);
+            const isSelected = (selectedLetter === letter);
+            const borderClass = isSelected ? "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-200 font-semibold ring-2 ring-emerald-500/50" : "border-slate-200 dark:border-slate-700 hover:border-slate-400";
+            
+            return `
+              <div onclick="selectExamOption(${q.id}, '${letter}')" class="p-4 rounded-xl border-2 transition cursor-pointer flex items-center space-x-3.5 ${borderClass}">
+                <span class="w-7 h-7 rounded-lg border ${isSelected ? 'bg-emerald-500 border-emerald-500 text-white' : 'border-slate-300 dark:border-slate-600 text-slate-500'} flex items-center justify-center font-bold text-xs">${letter}</span>
+                <span class="text-sm font-medium">${opt}</span>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
+          <button onclick="prevExamQuestion()" ${examState.currentQuestionIdx === 0 ? 'disabled' : ''} class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 text-xs font-semibold disabled:opacity-40 flex items-center space-x-1">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            <span>Câu trước</span>
+          </button>
+
+          <span class="text-xs text-slate-400">Câu ${examState.currentQuestionIdx + 1} của ${examState.totalQuestions}</span>
+
+          <button onclick="nextExamQuestion()" ${examState.currentQuestionIdx >= examState.totalQuestions - 1 ? 'disabled' : ''} class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold disabled:opacity-40 flex items-center space-x-1 shadow">
+            <span>Câu tiếp theo</span>
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      `;
+
+      lucide.createIcons();
+    }
+
+    function renderExamQuestionGrid() {
+      const grid = document.getElementById('examQuestionGrid');
+      grid.innerHTML = '';
+
+      let answeredCount = 0;
+
+      examState.questions.forEach((q, idx) => {
+        const isAnswered = !!examState.userAnswers[q.id];
+        const isFlagged = !!examState.flagged[q.id];
+        const isCurrent = (idx === examState.currentQuestionIdx);
+
+        if (isAnswered) answeredCount++;
+
+        let btnClass = "h-8 rounded-lg text-xs font-bold transition flex items-center justify-center relative ";
+        if (isCurrent) {
+          btnClass += "ring-2 ring-emerald-500 ring-offset-2 dark:ring-offset-slate-900 ";
+        }
+
+        if (isFlagged) {
+          btnClass += "bg-amber-400 text-amber-950 ";
+        } else if (isAnswered) {
+          btnClass += "bg-emerald-500 text-white ";
+        } else {
+          btnClass += "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 ";
+        }
+
+        const btn = document.createElement('button');
+        btn.className = btnClass;
+        btn.innerText = idx + 1;
+        btn.onclick = () => {
+          examState.currentQuestionIdx = idx;
+          renderExamCurrentQuestion();
+          renderExamQuestionGrid();
+        };
+        grid.appendChild(btn);
+      });
+
+      document.getElementById('examAnsweredCount').innerText = `${answeredCount}/${examState.totalQuestions}`;
+    }
+
+    function selectExamOption(qId, letter) {
+      examState.userAnswers[qId] = letter;
+      renderExamCurrentQuestion();
+      renderExamQuestionGrid();
+    }
+
+    function toggleExamFlag() {
+      const q = examState.questions[examState.currentQuestionIdx];
+      if (!q) return;
+      examState.flagged[q.id] = !examState.flagged[q.id];
+      renderExamCurrentQuestion();
+      renderExamQuestionGrid();
+    }
+
+    function nextExamQuestion() {
+      if (examState.currentQuestionIdx < examState.totalQuestions - 1) {
+        examState.currentQuestionIdx++;
+        renderExamCurrentQuestion();
+        renderExamQuestionGrid();
+      }
+    }
+
+    function prevExamQuestion() {
+      if (examState.currentQuestionIdx > 0) {
+        examState.currentQuestionIdx--;
+        renderExamCurrentQuestion();
+        renderExamQuestionGrid();
+      }
+    }
+
+    function confirmSubmitExam() {
+      const answered = Object.keys(examState.userAnswers).length;
+      const unAnswered = examState.totalQuestions - answered;
+      let msg = `Bạn đã hoàn thành ${answered}/${examState.totalQuestions} câu hỏi.`;
+      if (unAnswered > 0) {
+        msg += `\nVẫn còn ${unAnswered} câu hỏi chưa trả lời! Bạn có chắc chắn muốn nộp bài ngay không?`;
+      } else {
+        msg += `\nBạn có muốn nộp bài thi và xem kết quả không?`;
+      }
+
+      if (confirm(msg)) {
+        submitExam();
+      }
+    }
+
+    function submitExam() {
+      clearInterval(examState.timerInterval);
+      examState.active = false;
+
+      // Grade the exam
+      let totalCorrect = 0;
+      const domainStats = {
+        1: { total: 0, correct: 0, name: "Domain 1: Security Principles" },
+        2: { total: 0, correct: 0, name: "Domain 2: BCDR & IR" },
+        3: { total: 0, correct: 0, name: "Domain 3: Access Control" },
+        4: { total: 0, correct: 0, name: "Domain 4: Network Security" },
+        5: { total: 0, correct: 0, name: "Domain 5: Security Operations" }
+      };
+
+      examState.questions.forEach(q => {
+        const did = q.domain_id;
+        if (domainStats[did]) domainStats[did].total++;
+
+        const userLetter = examState.userAnswers[q.id];
+        const isCorrect = (userLetter === q.correct_option);
+
+        if (isCorrect) {
+          totalCorrect++;
+          if (domainStats[did]) domainStats[did].correct++;
+        } else {
+          if (!userState.mistakeQuestions.includes(q.id)) {
+            userState.mistakeQuestions.push(q.id);
+          }
+        }
+
+        // Save in answeredQuestions
+        if (userLetter) {
+          userState.answeredQuestions[q.id] = {
+            chosen: userLetter,
+            correct: isCorrect,
+            timestamp: Date.now()
+          };
+        }
+      });
+
+      const scorePercent = Math.round((totalCorrect / examState.totalQuestions) * 100);
+      const isPass = scorePercent >= 70;
+
+      // Record in history
+      userState.mockExamsHistory.push({
+        date: new Date().toLocaleDateString('vi-VN'),
+        total: examState.totalQuestions,
+        correct: totalCorrect,
+        score: scorePercent,
+        pass: isPass
+      });
+      saveUserState();
+
+      // Launch Confetti if Passed!
+      if (isPass && typeof confetti === 'function') {
+        confetti({
+          particleCount: 120,
+          spread: 80,
+          origin: { y: 0.6 }
+        });
+      }
+
+      // Hide Arena, Show Result
+      document.getElementById('examActiveArena').classList.add('hidden');
+      const resultContainer = document.getElementById('examResultScreen');
+      resultContainer.classList.remove('hidden');
+
+      resultContainer.innerHTML = `
+        <div class="max-w-3xl mx-auto bg-white dark:bg-slate-900 rounded-3xl p-8 border border-slate-200 dark:border-slate-800 shadow-xl text-center space-y-6">
+          <div class="w-20 h-20 rounded-full mx-auto flex items-center justify-center ${isPass ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600'}">
+            <i data-lucide="${isPass ? 'trophy' : 'alert-circle'}" class="w-10 h-10"></i>
+          </div>
+
+          <div>
+            <span class="px-3 py-1 rounded-full text-xs font-extrabold ${isPass ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700' : 'bg-red-100 dark:bg-red-950 text-red-700'}">
+              ${isPass ? 'KẾT QUẢ: ĐẠT (PASS)' : 'KẾT QUẢ: CHƯA ĐẠT (FAIL)'}
+            </span>
+            <h2 class="text-3xl font-extrabold mt-3">${scorePercent}% Điểm</h2>
+            <p class="text-sm text-slate-500 mt-1">Trả lời đúng ${totalCorrect} trên tổng số ${examState.totalQuestions} câu hỏi (Chuẩn đỗ kỳ thi ISC2 CC: 70%)</p>
+          </div>
+
+          <!-- Domain Breakdown -->
+          <div class="space-y-3 text-left pt-4 border-t border-slate-100 dark:border-slate-800">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Kết quả chi tiết theo từng Domain:</h3>
+            ${Object.values(domainStats).map(d => {
+              const pct = d.total > 0 ? Math.round((d.correct / d.total) * 100) : 0;
+              const color = pct >= 70 ? 'bg-emerald-500' : 'bg-amber-500';
+              return `
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 flex flex-col space-y-1.5">
+                  <div class="flex justify-between text-xs font-semibold">
+                    <span>${d.name}</span>
+                    <span>${d.correct}/${d.total} câu (${pct}%)</span>
+                  </div>
+                  <div class="w-full bg-slate-200 dark:bg-slate-700 h-1.5 rounded-full overflow-hidden">
+                    <div class="${color} h-1.5 rounded-full" style="width: ${pct}%"></div>
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+          <div class="flex items-center justify-center space-x-3 pt-4">
+            <button onclick="startMockExam(examState.totalQuestions)" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow transition">
+              Thi lại lần nữa
+            </button>
+            <button onclick="switchTab('dashboard')" class="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-semibold hover:bg-slate-100 transition">
+              Về trang tổng quan
+            </button>
+            <button onclick="switchTab('mistakes')" class="px-5 py-2.5 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 text-xs font-bold transition">
+              Ôn lại câu sai trong bài thi
+            </button>
+          </div>
+        </div>
+      `;
+
+      lucide.createIcons();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function startQuickQuiz(count) {
+      startMockExam(count);
+    }
+
+    // 5. FLASHCARDS LOGIC
+    function initFlashcards() {
+      flashcardState.filteredCards = [...(APP_DATA.questions || [])];
+      flashcardState.currentIndex = 0;
+      flashcardState.isFlipped = false;
+      renderCurrentFlashcard();
+    }
+
+    function filterFlashcards() {
+      const dId = parseInt(document.getElementById('flashcardDomainSelect').value);
+      if (dId === 0) {
+        flashcardState.filteredCards = [...APP_DATA.questions];
+      } else {
+        flashcardState.filteredCards = APP_DATA.questions.filter(q => q.domain_id === dId);
+      }
+      flashcardState.currentIndex = 0;
+      flashcardState.isFlipped = false;
+      renderCurrentFlashcard();
+    }
+
+    function shuffleFlashcards() {
+      shuffleArray(flashcardState.filteredCards);
+      flashcardState.currentIndex = 0;
+      flashcardState.isFlipped = false;
+      renderCurrentFlashcard();
+    }
+
+    function flipFlashcard() {
+      flashcardState.isFlipped = !flashcardState.isFlipped;
+      const el = document.getElementById('flashcardElement');
+      if (flashcardState.isFlipped) {
+        el.classList.add('rotate-y-180');
+      } else {
+        el.classList.remove('rotate-y-180');
+      }
+    }
+
+    function renderCurrentFlashcard() {
+      const cards = flashcardState.filteredCards;
+      if (!cards || cards.length === 0) return;
+
+      const q = cards[flashcardState.currentIndex];
+      document.getElementById('flashcardIndexText').innerText = `Thẻ ${flashcardState.currentIndex + 1} / ${cards.length}`;
+
+      // Reset flip
+      flashcardState.isFlipped = false;
+      document.getElementById('flashcardElement').classList.remove('rotate-y-180');
+
+      // Populate front
+      document.getElementById('fcDomainBadge').innerText = q.domain_name_vi || `Domain ${q.domain_id}`;
+      document.getElementById('fcPageBadge').innerText = `Trang ${q.page}`;
+      document.getElementById('fcQuestionText').innerText = q.question;
+
+      // Populate back
+      document.getElementById('fcBackTopic').innerText = q.topic || `Domain ${q.domain_id}`;
+      document.getElementById('fcAnswerText').innerText = q.answer || q.correct_answer;
+      document.getElementById('fcExplanationText').innerText = q.explanation || "Khái niệm cốt lõi cần ghi nhớ trong kỳ thi ISC2 CC.";
+    }
+
+    function nextFlashcard() {
+      if (flashcardState.currentIndex < flashcardState.filteredCards.length - 1) {
+        flashcardState.currentIndex++;
+        renderCurrentFlashcard();
+      }
+    }
+
+    function prevFlashcard() {
+      if (flashcardState.currentIndex > 0) {
+        flashcardState.currentIndex--;
+        renderCurrentFlashcard();
+      }
+    }
+
+    function markFlashcardStatus(status) {
+      const q = flashcardState.filteredCards[flashcardState.currentIndex];
+      if (!q) return;
+
+      userState.flashcardsMastery[q.id] = status;
+      saveUserState();
+
+      // Automatically advance to next card
+      nextFlashcard();
+    }
+
+    // 6. STUDY GUIDE & CHEAT SHEETS
+    function initStudy() {
+      selectStudyDomain(1);
+      renderReferenceTables();
+    }
+
+    function viewDomainStudy(domainId) {
+      switchTab('study');
+      selectStudyDomain(domainId);
+    }
+
+    function selectStudyDomain(dId) {
+      document.querySelectorAll('.study-domain-btn').forEach(btn => {
+        if (btn.getAttribute('data-d') == dId) {
+          btn.className = "study-domain-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-600 text-white shadow";
+        } else {
+          btn.className = "study-domain-btn px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800";
+        }
+      });
+
+      const container = document.getElementById('studyContentContainer');
+      const summaries = APP_DATA.domain_summaries || [];
+      const domainData = summaries.find(s => s.domain_id === dId);
+
+      if (!domainData) {
+        container.innerHTML = `<div class="p-6 text-slate-400">Đang cập nhật nội dung Domain ${dId}...</div>`;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-sm space-y-6">
+          <div class="flex items-center justify-between">
+            <h2 class="text-2xl font-extrabold text-slate-900 dark:text-white">${domainData.title}</h2>
+            <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+              Chiếm ${domainData.weight} đề thi
+            </span>
+          </div>
+
+          <!-- Exam Tips Callout -->
+          <div class="p-5 rounded-2xl bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/30 dark:to-orange-950/20 border border-amber-200/60 dark:border-amber-900/40">
+            <div class="flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-amber-700 dark:text-amber-400 mb-2">
+              <i data-lucide="zap" class="w-4 h-4"></i>
+              <span>Mẹo thi cốt lõi & Điểm cần nhớ (Exam Tips)</span>
+            </div>
+            <ul class="space-y-1.5 text-xs sm:text-sm text-slate-700 dark:text-slate-300 list-disc list-inside">
+              ${domainData.exam_tips.map(tip => `<li>${tip}</li>`).join('')}
+            </ul>
+          </div>
+
+          <!-- Sections -->
+          <div class="space-y-6 pt-4">
+            ${domainData.sections.map(sec => `
+              <div class="space-y-2 border-b border-slate-100 dark:border-slate-800 pb-5 last:border-b-0">
+                <h3 class="text-base font-bold text-slate-900 dark:text-white flex items-center space-x-2">
+                  <i data-lucide="bookmark" class="w-4 h-4 text-emerald-500"></i>
+                  <span>${sec.heading}</span>
+                </h3>
+                <div class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed space-y-2 pl-6 whitespace-pre-line">
+                  ${sec.content}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+
+          <div class="pt-4 flex items-center justify-end">
+            <button onclick="startDomainPractice(${dId})" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow flex items-center space-x-2">
+              <i data-lucide="play" class="w-4 h-4"></i>
+              <span>Luyện câu hỏi Domain ${dId} ngay</span>
+            </button>
+          </div>
+        </div>
+      `;
+
+      lucide.createIcons();
+    }
+
+    function showCheatSheetsOnly() {
+      const container = document.getElementById('cheatSheetsContainer');
+      container.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function renderReferenceTables() {
+      const container = document.getElementById('referenceTablesList');
+      container.innerHTML = '';
+
+      if (!APP_DATA.reference_tables) return;
+
+      APP_DATA.reference_tables.forEach(table => {
+        const card = document.createElement('div');
+        card.className = "bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden";
+        card.innerHTML = `
+          <div class="p-4 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <div>
+              <h3 class="font-bold text-sm text-slate-900 dark:text-white">${table.title_vi || table.title}</h3>
+              <p class="text-xs text-slate-400">Giáo trình ISC2 CC Trang ${table.page} • Domain ${table.domain_id}</p>
+            </div>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+              Cheat Sheet
+            </span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-100 dark:bg-slate-800/40 text-slate-500 uppercase font-semibold">
+                <tr>
+                  ${table.columns.map(c => `<th class="p-3 border-b border-slate-200 dark:border-slate-800">${c}</th>`).join('')}
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                ${table.rows.map(r => `
+                  <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/30">
+                    ${r.map((cell, idx) => `<td class="p-3 ${idx === 0 ? 'font-bold text-slate-900 dark:text-slate-100' : 'text-slate-600 dark:text-slate-300'}">${cell}</td>`).join('')}
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+      lucide.createIcons();
+    }
+
+    // 7. GLOSSARY
+    function initGlossary() {
+      renderGlossaryTerms(APP_DATA.glossary || []);
+    }
+
+    function filterGlossary() {
+      const q = document.getElementById('glossarySearchInput').value.toLowerCase().trim();
+      const terms = APP_DATA.glossary || [];
+      if (!q) {
+        renderGlossaryTerms(terms);
+        return;
+      }
+      const filtered = terms.filter(t => 
+        t.term.toLowerCase().includes(q) || 
+        t.en.toLowerCase().includes(q) || 
+        t.vi.toLowerCase().includes(q)
+      );
+      renderGlossaryTerms(filtered);
+    }
+
+    function renderGlossaryTerms(terms) {
+      const grid = document.getElementById('glossaryGrid');
+      grid.innerHTML = '';
+
+      if (terms.length === 0) {
+        grid.innerHTML = `<div class="col-span-2 text-center py-8 text-slate-400 text-xs">Không tìm thấy thuật ngữ phù hợp</div>`;
+        return;
+      }
+
+      terms.forEach(t => {
+        const card = document.createElement('div');
+        card.className = "bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-2 hover:border-emerald-500/40 transition";
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <h3 class="font-extrabold text-base text-emerald-600 dark:text-emerald-400">${t.term}</h3>
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500">Domain ${t.domain}</span>
+          </div>
+          <p class="text-xs text-slate-700 dark:text-slate-200 leading-relaxed font-medium">${t.vi}</p>
+          <p class="text-xs text-slate-400 italic">${t.en}</p>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // 8. MISTAKES & BOOKMARKS
+    function renderMistakes() {
+      const container = document.getElementById('mistakesListContainer');
+      const mistakeIds = userState.mistakeQuestions || [];
+      const bookmarkedIds = userState.bookmarkedQuestions || [];
+
+      // Combine unique IDs
+      const allIds = Array.from(new Set([...mistakeIds, ...bookmarkedIds]));
+
+      const btnStart = document.getElementById('btnStartMistakesQuiz');
+      if (allIds.length === 0) {
+        if (btnStart) btnStart.disabled = true;
+        container.innerHTML = `
+          <div class="text-center py-12 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
+            <div class="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 mx-auto flex items-center justify-center mb-3">
+              <i data-lucide="check" class="w-6 h-6"></i>
+            </div>
+            <h3 class="font-bold text-base">Tuyệt vời! Bạn không có câu sai nào tồn đọng</h3>
+            <p class="text-xs text-slate-400 mt-1">Khi bạn làm sai câu hỏi trong bài luyện tập hoặc thi thử, chúng sẽ tự động được lưu lại tại đây.</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      if (btnStart) btnStart.disabled = false;
+      container.innerHTML = '';
+
+      allIds.forEach(id => {
+        const q = APP_DATA.questions.find(item => item.id === id);
+        if (!q) return;
+
+        const isMistake = mistakeIds.includes(id);
+        const isBookmarked = bookmarkedIds.includes(id);
+
+        const card = document.createElement('div');
+        card.className = "bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-3";
+        card.innerHTML = `
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                ${q.domain_name_vi || `Domain ${q.domain_id}`}
+              </span>
+              ${isMistake ? '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-red-100 text-red-700">Từng trả lời sai</span>' : ''}
+              ${isBookmarked ? '<span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-700">Đã gắn sao</span>' : ''}
+            </div>
+            <button onclick="removeMistake(${q.id})" class="text-xs text-slate-400 hover:text-red-500" title="Bỏ khỏi danh sách">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <h4 class="font-bold text-sm text-slate-900 dark:text-white">${q.question}</h4>
+
+          <div class="p-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800/40 rounded-xl text-xs space-y-1">
+            <div class="font-bold text-emerald-700 dark:text-emerald-300">Đáp án chuẩn: ${q.correct_answer}</div>
+            <div class="text-slate-600 dark:text-slate-300">${q.explanation}</div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      lucide.createIcons();
+    }
+
+    function removeMistake(id) {
+      userState.mistakeQuestions = userState.mistakeQuestions.filter(x => x !== id);
+      userState.bookmarkedQuestions = userState.bookmarkedQuestions.filter(x => x !== id);
+      saveUserState();
+      renderMistakes();
+    }
+
+    function clearMistakesList() {
+      if (confirm("Xóa toàn bộ danh sách câu sai và câu đã lưu?")) {
+        userState.mistakeQuestions = [];
+        userState.bookmarkedQuestions = [];
+        saveUserState();
+        renderMistakes();
+      }
+    }
+
+    function startMistakesQuiz() {
+      const allIds = Array.from(new Set([...userState.mistakeQuestions, ...userState.bookmarkedQuestions]));
+      if (allIds.length === 0) return;
+
+      const mistakeQuestions = APP_DATA.questions.filter(q => allIds.includes(q.id));
+      practiceState.filteredQuestions = mistakeQuestions;
+      practiceState.currentIndex = 0;
+      renderPracticeQuestion();
+      switchTab('practice');
+    }
+
+    // 9. Keyboard Shortcuts Helper
+    function handleGlobalKeydown(e) {
+      // Don't intercept typing in search box
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+      const activeTab = document.querySelector('.tab-content.active');
+      if (!activeTab) return;
+      const tabId = activeTab.id;
+
+      // In Flashcards
+      if (tabId === 'tab-flashcards') {
+        if (e.code === 'Space') {
+          e.preventDefault();
+          flipFlashcard();
+        } else if (e.key === 'ArrowRight') {
+          nextFlashcard();
+        } else if (e.key === 'ArrowLeft') {
+          prevFlashcard();
+        } else if (e.key === '1') {
+          markFlashcardStatus('struggling');
+        } else if (e.key === '2') {
+          markFlashcardStatus('learning');
+        } else if (e.key === '3') {
+          markFlashcardStatus('mastered');
+        }
+      }
+
+      // In Practice
+      if (tabId === 'tab-practice') {
+        if (e.key === 'ArrowRight') {
+          nextPracticeQuestion();
+        } else if (e.key === 'ArrowLeft') {
+          prevPracticeQuestion();
+        } else if (['1', '2', '3', '4'].includes(e.key)) {
+          const idx = parseInt(e.key) - 1;
+          const q = practiceState.filteredQuestions[practiceState.currentIndex];
+          if (q && q.options[idx]) {
+            const letter = String.fromCharCode(65 + idx);
+            selectPracticeOption(q.id, letter, q.options[idx]);
+          }
+        }
+      }
+    }
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
+
+    function escapeHtml(text) {
+      return (text || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    }
+
+    // Start on DOM ready
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>

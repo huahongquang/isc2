@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/api/data",
+      "destination": "/isc2_data.json"
+    },
+    {
+      "source": "/api/pdf",
+      "destination": "/Certified in Cybersecurity (CC) Exam Guide.pdf"
+    }
+  ]
+}

@@ -111,10 +111,21 @@
             <span class="whitespace-nowrap">Ôn câu sai & Đã lưu</span>
             <span id="mistakeBadge" class="hidden absolute -top-1 -right-1 px-1.5 py-0.2 bg-red-500 text-white rounded-full text-[10px] font-bold">0</span>
           </button>
+          <!-- Admin Dashboard Tab (Visible for Super Admin, Admin, Manager, Staff) -->
+          <button id="navAdminTab" onclick="switchTab('admin')" class="nav-btn px-2.5 lg:px-3 py-1.5 rounded-lg text-xs lg:text-sm font-bold flex items-center space-x-1.5 whitespace-nowrap transition-all text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 relative shrink-0 border border-amber-200/60 dark:border-amber-800/60" data-tab="admin">
+            <i data-lucide="shield-alert" class="w-4 h-4 shrink-0 text-amber-500"></i>
+            <span class="whitespace-nowrap">Quản trị Backend</span>
+            <span id="navRoleBadge" class="px-1.5 py-0.2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded text-[10px] font-bold">👑 SA</span>
+          </button>
         </nav>
 
         <!-- Right Tools -->
         <div class="flex items-center space-x-2 shrink-0">
+          <!-- User Authentication Widget -->
+          <div id="userWidgetContainer" class="relative">
+            <!-- Populated by JS: Login Button or User Avatar/Role Dropdown -->
+          </div>
+
           <!-- Dark Mode Toggle -->
           <button onclick="toggleDarkMode()" class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition" title="Chuyển chế độ sáng/tối">
             <i id="themeIcon" data-lucide="moon" class="w-4 h-4"></i>
@@ -132,6 +143,10 @@
         <button onclick="switchTab('dashboard'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium flex items-center space-x-2 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
           <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
           <span>Tổng quan</span>
+        </button>
+        <button id="mobileNavAdminTab" onclick="switchTab('admin'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm font-bold flex items-center space-x-2 text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40">
+          <i data-lucide="shield-alert" class="w-4 h-4 text-amber-500"></i>
+          <span>Quản trị Backend (RBAC)</span>
         </button>
         <button onclick="switchTab('practice'); toggleMobileMenu();" class="w-full text-left px-3 py-2 rounded-lg text-sm font-medium flex items-center space-x-2 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
           <i data-lucide="check-circle" class="w-4 h-4"></i>
@@ -668,6 +683,498 @@
       </div>
     </div>
 
+    <!-- ========================================== -->
+    <!-- TAB 8: BACKEND ADMIN DASHBOARD & RBAC -->
+    <!-- ========================================== -->
+    <div id="tab-admin" class="tab-content space-y-6">
+      <!-- Admin Top Banner -->
+      <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white p-6 sm:p-8 shadow-xl border border-indigo-500/20">
+        <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div class="space-y-2">
+            <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-semibold border border-amber-400/30">
+              <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
+              <span>Hệ thống Quản trị & Điều hành Đào tạo ISC2 CC</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Trung tâm Quản trị & Phân quyền (RBAC)</h1>
+            <p class="text-xs sm:text-sm text-slate-300 max-w-2xl">
+              Quản lý toàn bộ 277+ câu hỏi trọng tâm, giám sát tiến độ học tập, cấu hình đề thi và phân quyền 4 cấp bậc: <strong class="text-amber-400">Super Admin</strong>, <strong class="text-blue-400">Admin</strong>, <strong class="text-emerald-400">Manager</strong>, <strong class="text-purple-400">Staff</strong>.
+            </p>
+          </div>
+
+          <!-- Current Logged In Role Badge & Actions -->
+          <div class="bg-white/10 backdrop-blur-md p-4 rounded-xl border border-white/10 flex flex-col items-start sm:items-end space-y-2 shrink-0">
+            <div class="flex items-center space-x-2">
+              <span class="text-xs text-slate-300">Tài khoản hiện tại:</span>
+              <span id="adminCurrentUserName" class="text-xs font-bold text-white">Nguyễn Quản Trị Tối Cao</span>
+            </div>
+            <div id="adminCurrentRoleBadgeContainer" class="flex items-center space-x-1.5">
+              <span class="px-2.5 py-1 rounded-lg bg-amber-500 text-white text-xs font-bold shadow-sm">👑 Super Admin</span>
+            </div>
+            <div class="pt-1 flex items-center space-x-2">
+              <button onclick="openLoginModal()" class="px-2.5 py-1 rounded bg-white/20 hover:bg-white/30 text-white text-[11px] font-semibold transition">
+                ⚡ Đổi vai trò
+              </button>
+              <button onclick="exportQuestionsJSON()" class="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-700 text-white text-[11px] font-semibold transition flex items-center space-x-1">
+                <i data-lucide="download" class="w-3 h-3"></i>
+                <span>Xuất JSON</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin Navigation Sub-Tabs -->
+      <div class="flex flex-wrap items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+        <button onclick="switchAdminSubTab('overview')" class="admin-subtab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition bg-emerald-600 text-white shadow" data-subtab="overview">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+          <span>Tổng quan KPI</span>
+        </button>
+        <button onclick="switchAdminSubTab('questions')" class="admin-subtab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700" data-subtab="questions">
+          <i data-lucide="help-circle" class="w-4 h-4"></i>
+          <span>Ngân hàng Câu hỏi</span>
+        </button>
+        <button onclick="switchAdminSubTab('users')" class="admin-subtab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700" data-subtab="users">
+          <i data-lucide="users" class="w-4 h-4"></i>
+          <span>Người dùng & Ma trận RBAC</span>
+        </button>
+        <button onclick="switchAdminSubTab('settings')" class="admin-subtab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700" data-subtab="settings">
+          <i data-lucide="settings" class="w-4 h-4"></i>
+          <span>Cấu hình Đề thi & Hệ thống</span>
+        </button>
+        <button onclick="switchAdminSubTab('logs')" class="admin-subtab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700" data-subtab="logs">
+          <i data-lucide="activity" class="w-4 h-4"></i>
+          <span>Nhật ký Hoạt động</span>
+        </button>
+      </div>
+
+      <!-- Sub-Tab 1: Overview -->
+      <div id="admin-subtab-overview" class="admin-subtab-content space-y-6">
+        <!-- 4 KPI Metrics Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
+            <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+              <i data-lucide="database" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Ngân hàng câu hỏi</p>
+              <h3 id="adminTotalQuestions" class="text-2xl font-black text-slate-800 dark:text-white">277 câu</h3>
+              <p class="text-[11px] text-emerald-500 font-semibold mt-0.5">5 Domain chuẩn ISC2</p>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
+            <div class="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+              <i data-lucide="shield-check" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Tài khoản & Phân quyền</p>
+              <h3 id="adminTotalUsers" class="text-2xl font-black text-slate-800 dark:text-white">5 Users</h3>
+              <p class="text-[11px] text-purple-500 font-semibold mt-0.5">4 Level Quản trị + Học viên</p>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
+            <div class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+              <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Lượt thi mô phỏng</p>
+              <h3 id="adminExamAttempts" class="text-2xl font-black text-slate-800 dark:text-white">12 lượt</h3>
+              <p class="text-[11px] text-emerald-500 font-semibold mt-0.5">Hoàn thành 100 câu</p>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
+            <div class="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
+              <i data-lucide="award" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Tỷ lệ Pass trung bình</p>
+              <h3 id="adminAvgPassRate" class="text-2xl font-black text-slate-800 dark:text-white">78.5%</h3>
+              <p class="text-[11px] text-amber-500 font-semibold mt-0.5">Tiêu chuẩn đỗ ≥ 70%</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Domain Weight Distribution & Current Role Permissions -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-bold text-base text-slate-800 dark:text-white">Phân bổ 5 Domain theo Trọng số Đề thi ISC2 CC</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Tỷ lệ cấu trúc câu hỏi chính thức của kỳ thi CC quốc tế</p>
+              </div>
+              <span class="px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-600 text-xs font-bold">Chuẩn ISC2</span>
+            </div>
+
+            <div class="space-y-3 pt-2">
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="font-semibold text-slate-700 dark:text-slate-300">Domain 1: Security Principles (Nguyên lý ATTT)</span>
+                  <span class="font-bold text-emerald-600">26% (49 câu)</span>
+                </div>
+                <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5">
+                  <div class="bg-emerald-500 h-2.5 rounded-full" style="width: 26%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="font-semibold text-slate-700 dark:text-slate-300">Domain 2: Business Continuity, Disaster Recovery & Incident Response</span>
+                  <span class="font-bold text-teal-600">10% (42 câu)</span>
+                </div>
+                <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5">
+                  <div class="bg-teal-500 h-2.5 rounded-full" style="width: 10%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="font-semibold text-slate-700 dark:text-slate-300">Domain 3: Access Controls Concepts (Kiểm soát truy cập)</span>
+                  <span class="font-bold text-blue-600">22% (30 câu)</span>
+                </div>
+                <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5">
+                  <div class="bg-blue-500 h-2.5 rounded-full" style="width: 22%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="font-semibold text-slate-700 dark:text-slate-300">Domain 4: Network Security (An toàn mạng)</span>
+                  <span class="font-bold text-indigo-600">24% (82 câu)</span>
+                </div>
+                <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5">
+                  <div class="bg-indigo-500 h-2.5 rounded-full" style="width: 24%"></div>
+                </div>
+              </div>
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="font-semibold text-slate-700 dark:text-slate-300">Domain 5: Security Operations (Hoạt động an ninh)</span>
+                  <span class="font-bold text-purple-600">18% (74 câu)</span>
+                </div>
+                <div class="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2.5">
+                  <div class="bg-purple-500 h-2.5 rounded-full" style="width: 18%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Current Level Permissions Card -->
+          <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="flex items-center space-x-2">
+                <i data-lucide="key" class="w-5 h-5 text-amber-500"></i>
+                <h3 class="font-bold text-base text-slate-800 dark:text-white">Quyền hạn Cấp bậc của Bạn</h3>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Chi tiết phân quyền hệ thống đang áp dụng</p>
+              
+              <div id="adminRolePermissionsList" class="mt-4 space-y-2 text-xs">
+                <!-- Dynamically filled based on currentUser.role -->
+              </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800">
+              <button onclick="switchAdminSubTab('users')" class="w-full py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-bold text-slate-700 dark:text-slate-300 transition flex items-center justify-center space-x-1">
+                <span>Xem Toàn bộ Ma trận RBAC</span>
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-Tab 2: Questions CRUD -->
+      <div id="admin-subtab-questions" class="admin-subtab-content hidden space-y-6">
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-lg font-bold text-slate-800 dark:text-white">Quản lý Ngân hàng Câu hỏi</h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Thêm mới, tìm kiếm, chỉnh sửa và quản lý 277+ câu hỏi trắc nghiệm</p>
+            </div>
+
+            <div class="flex items-center space-x-2">
+              <button id="adminBtnAddQuestion" onclick="openQuestionModal()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow flex items-center space-x-1.5">
+                <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                <span>+ Thêm câu hỏi mới</span>
+              </button>
+              <button onclick="exportQuestionsJSON()" class="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-xs font-medium text-slate-600 dark:text-slate-300 transition flex items-center space-x-1">
+                <i data-lucide="file-down" class="w-3.5 h-3.5 text-blue-500"></i>
+                <span>Xuất JSON</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Filters -->
+          <div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
+            <div class="relative flex-1 w-full">
+              <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+              <input type="text" id="adminQuestionSearch" oninput="renderAdminQuestionsList()" placeholder="Tìm theo nội dung câu hỏi, từ khóa, đáp án..." class="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            </div>
+
+            <select id="adminQuestionDomainFilter" onchange="renderAdminQuestionsList()" class="w-full sm:w-64 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500">
+              <option value="all">Tất cả Domain (Toàn bộ 277+ câu)</option>
+              <option value="1">Domain 1: Nguyên lý an toàn thông tin</option>
+              <option value="2">Domain 2: BCP, DRP & Incident Response</option>
+              <option value="3">Domain 3: Kiểm soát truy cập (Access Control)</option>
+              <option value="4">Domain 4: An toàn mạng (Network Security)</option>
+              <option value="5">Domain 5: Hoạt động an ninh (Security Ops)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Questions Table -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-slate-500 font-semibold">
+                <tr>
+                  <th class="py-3 px-4 w-14">#</th>
+                  <th class="py-3 px-4 w-28">Domain</th>
+                  <th class="py-3 px-4">Nội dung câu hỏi</th>
+                  <th class="py-3 px-4 w-24 text-center">Đáp án đúng</th>
+                  <th class="py-3 px-4 w-24 text-center">Trang PDF</th>
+                  <th class="py-3 px-4 w-28 text-center">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="adminQuestionsTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+                <!-- Rendered dynamically by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination Controls -->
+          <div class="p-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
+            <span id="adminQuestionsPaginationInfo">Đang hiển thị...</span>
+            <div class="flex items-center space-x-1.5" id="adminQuestionsPaginationBtns">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-Tab 3: Users & RBAC Matrix -->
+      <div id="admin-subtab-users" class="admin-subtab-content hidden space-y-6">
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h2 class="text-lg font-bold text-slate-800 dark:text-white">Quản lý Tài khoản & Phân quyền Người dùng</h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Phân định vai trò và kiểm soát quyền hạn theo mô hình RBAC chuẩn quốc tế</p>
+            </div>
+
+            <button id="adminBtnAddUser" onclick="openUserModal()" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition shadow flex items-center space-x-1.5">
+              <i data-lucide="user-plus" class="w-4 h-4"></i>
+              <span>+ Thêm tài khoản mới</span>
+            </button>
+          </div>
+
+          <!-- Users Table -->
+          <div class="overflow-x-auto pt-2">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-slate-500 font-semibold">
+                <tr>
+                  <th class="py-3 px-4">Người dùng</th>
+                  <th class="py-3 px-4">Tên đăng nhập</th>
+                  <th class="py-3 px-4">Cấp bậc / Role</th>
+                  <th class="py-3 px-4 text-center">Trạng thái</th>
+                  <th class="py-3 px-4">Lần đăng nhập</th>
+                  <th class="py-3 px-4 text-center">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="adminUsersTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+                <!-- Dynamically filled by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Comprehensive RBAC Matrix Table -->
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="shield" class="w-5 h-5 text-indigo-500"></i>
+            <h3 class="font-bold text-base text-slate-800 dark:text-white">Ma trận Phân quyền Cấp bậc Hệ thống (RBAC Matrix)</h3>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400">
+            Mô tả chi tiết quyền hạn của từng cấp quản trị theo nguyên tắc Đặc quyền tối thiểu (Least Privilege) của ISC2
+          </p>
+
+          <div class="overflow-x-auto pt-2">
+            <table class="w-full text-left text-xs border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
+              <thead class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold border-b border-slate-200 dark:border-slate-800">
+                <tr>
+                  <th class="py-3 px-4">Quyền hạn / Chức năng</th>
+                  <th class="py-3 px-4 text-center text-amber-600 dark:text-amber-400">👑 Super Admin</th>
+                  <th class="py-3 px-4 text-center text-blue-600 dark:text-blue-400">🛡️ Admin</th>
+                  <th class="py-3 px-4 text-center text-emerald-600 dark:text-emerald-400">💼 Manager</th>
+                  <th class="py-3 px-4 text-center text-purple-600 dark:text-purple-400">📋 Staff</th>
+                  <th class="py-3 px-4 text-center text-slate-500">🎓 Student</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                <tr>
+                  <td class="py-2.5 px-4 font-medium">Toàn quyền Quản trị & Cấu hình Hệ thống</td>
+                  <td class="py-2.5 px-4 text-center font-bold text-emerald-600">✅ Toàn quyền</td>
+                  <td class="py-2.5 px-4 text-center text-slate-400">❌ Không</td>
+                  <td class="py-2.5 px-4 text-center text-slate-400">❌ Không</td>
+                  <td class="py-2.5 px-4 text-center text-slate-400">❌ Không</td>
+                  <td class="py-2.5 px-4 text-center text-slate-400">❌ Không</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 px-4 font-medium">Quản lý Tài khoản & Cấp bậc User</td>
+                  <td class="py-2.5 px-4 text-center font-bold text-emerald-600">✅ Tất cả level</td>
+                  <td class="py-2.5 px-4 text-center font-bold text-blue-600">🟡 Cấp dưới</td>
+                  <td class="py-2.5 px-4 text-center text-slate-400">👁️ Chỉ xem</td>
+                  <td class="py-2.5 px-4 text-center text-slate-400">❌ Không</td>
+                  <td class="py-2.5 px-4 text-center text-slate-400">❌ Không</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 px-4 font-medium">Thêm câu hỏi mới vào Ngân hàng</td>
+                  <td class="py-2.5 px-4 text-center font-bold text-emerald-600">✅ Có</td>
+                  <td class="py-2.5 px-4 text-center font-bold text-emerald-600">✅ Có</td>
+                  <td class="py-2.5 px-4 text-center font-bold text-emerald-600">✅ Có</td>
+                  <td class="py-2.5 px-4 text-center font-bold text-emerald-600">✅ Có</td>
+                  <td class="py-2.5 px-4 text-center text-slate-400">❌ Không</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 px-4 font-medium">Chỉnh sửa câu hỏi & Cập nhật giải thích</td>
+                  <td class="py-2.5 px-4 text-center font-bold text-emerald-600">✅ Toàn bộ</td>
+                  <td class="py-2.5 px-4 text-center font-bold text-emerald-600">✅ Toàn bộ</td>
+                  <td class="py-2.5 px-4 text-center font-bold text-emerald-600">✅ Nội dung</td>
+                  <td class="py-2.5 px-4 text-center font-bold text-purple-600">🟡 Ghi chú</td>
+                  <td class="py-2.5 px-4 text-center text-slate-400">❌ Không</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 px-4 font-medium">Xóa câu hỏi khỏi Ngân hàng</td>
+                  <td class="py-2.5 px-4 text-center font-bold text-emerald-600">✅ Có</td>
+                  <td class="py-2.5 px-4 text-center font-bold text-emerald-600">✅ Có</td>
+                  <td class="py-2.5 px-4 text-center text-slate-400">❌ Không</td>
+                  <td class="py-2.5 px-4 text-center text-slate-400">❌ Không</td>
+                  <td class="py-2.5 px-4 text-center text-slate-400">❌ Không</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 px-4 font-medium">Cấu hình Đề thi mô phỏng (Presets)</td>
+                  <td class="py-2.5 px-4 text-center font-bold text-emerald-600">✅ Có</td>
+                  <td class="py-2.5 px-4 text-center font-bold text-emerald-600">✅ Có</td>
+                  <td class="py-2.5 px-4 text-center font-bold text-emerald-600">✅ Có</td>
+                  <td class="py-2.5 px-4 text-center text-slate-400">👁️ Chỉ xem</td>
+                  <td class="py-2.5 px-4 text-center text-slate-400">❌ Không</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 px-4 font-medium">Xuất / Nhập Backup Dữ liệu JSON</td>
+                  <td class="py-2.5 px-4 text-center font-bold text-emerald-600">✅ Có</td>
+                  <td class="py-2.5 px-4 text-center font-bold text-emerald-600">✅ Có</td>
+                  <td class="py-2.5 px-4 text-center text-slate-400">❌ Không</td>
+                  <td class="py-2.5 px-4 text-center text-slate-400">❌ Không</td>
+                  <td class="py-2.5 px-4 text-center text-slate-400">❌ Không</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 px-4 font-medium">Xem Nhật ký Hoạt động (Audit Logs)</td>
+                  <td class="py-2.5 px-4 text-center font-bold text-emerald-600">✅ Toàn diện</td>
+                  <td class="py-2.5 px-4 text-center font-bold text-emerald-600">✅ Toàn diện</td>
+                  <td class="py-2.5 px-4 text-center font-bold text-emerald-600">✅ Xem</td>
+                  <td class="py-2.5 px-4 text-center font-bold text-purple-600">🟡 Cơ bản</td>
+                  <td class="py-2.5 px-4 text-center text-slate-400">❌ Không</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-Tab 4: Exam Settings & System Maintenance -->
+      <div id="admin-subtab-settings" class="admin-subtab-content hidden space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="timer" class="w-5 h-5 text-emerald-500"></i>
+              <h3 class="font-bold text-base text-slate-800 dark:text-white">Cấu hình Đề thi Mô phỏng</h3>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Tùy chỉnh thời gian, số lượng câu hỏi và tiêu chuẩn đỗ chứng chỉ</p>
+
+            <div class="space-y-4 pt-2">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Số câu hỏi trong 1 đề thi thử</label>
+                <select id="configExamQuestionsCount" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs">
+                  <option value="100">100 câu (Chuẩn kỳ thi ISC2 CC quốc tế)</option>
+                  <option value="50">50 câu (Đề rút gọn 1 tiếng)</option>
+                  <option value="25">25 câu (Kiểm tra nhanh 30 phút)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Thời gian làm bài (Phút)</label>
+                <input type="number" id="configExamDuration" value="120" min="15" max="240" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs">
+                <span class="text-[11px] text-slate-400">Mặc định: 120 phút (2 giờ)</span>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Điểm chuẩn Đỗ (Pass Rate %)</label>
+                <input type="number" id="configExamPassThreshold" value="70" min="50" max="95" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs">
+                <span class="text-[11px] text-slate-400">Tiêu chuẩn quốc tế ISC2: 70%</span>
+              </div>
+
+              <button onclick="saveExamSettings()" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow transition">
+                Lưu cấu hình đề thi
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="wrench" class="w-5 h-5 text-indigo-500"></i>
+              <h3 class="font-bold text-base text-slate-800 dark:text-white">Bảo trì & Sao lưu Dữ liệu</h3>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Công cụ sao lưu, phục hồi và làm mới hệ thống</p>
+
+            <div class="space-y-3 pt-2">
+              <button onclick="exportFullBackupJSON()" class="w-full py-2.5 rounded-xl border border-indigo-200 dark:border-indigo-800/80 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 font-bold text-xs hover:bg-indigo-100 transition flex items-center justify-center space-x-2">
+                <i data-lucide="download-cloud" class="w-4 h-4"></i>
+                <span>Tải tệp Sao lưu Toàn bộ Hệ thống (.json)</span>
+              </button>
+
+              <button onclick="resetDefaultQuestions()" class="w-full py-2.5 rounded-xl border border-amber-200 dark:border-amber-800/80 bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 font-bold text-xs hover:bg-amber-100 transition flex items-center justify-center space-x-2">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                <span>Khôi phục Ngân hàng 277 câu gốc</span>
+              </button>
+
+              <button onclick="clearLearningProgress()" class="w-full py-2.5 rounded-xl border border-red-200 dark:border-red-800/80 bg-red-50 dark:bg-red-950/40 text-red-600 dark:text-red-400 font-bold text-xs hover:bg-red-100 transition flex items-center justify-center space-x-2">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                <span>Xóa sạch lịch sử thi & tiến độ học tập</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub-Tab 5: Audit Logs -->
+      <div id="admin-subtab-logs" class="admin-subtab-content hidden space-y-6">
+        <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-lg font-bold text-slate-800 dark:text-white">Nhật ký Hoạt động Hệ thống (Audit Logs)</h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Theo dõi toàn bộ phiên đăng nhập, thay đổi câu hỏi và phân quyền</p>
+            </div>
+            <button onclick="clearAuditLogs()" class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs text-slate-400 hover:text-red-500 transition">
+              Xóa nhật ký
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-50 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-800 text-slate-500 font-semibold">
+                <tr>
+                  <th class="py-3 px-4 w-36">Thời gian</th>
+                  <th class="py-3 px-4 w-44">Người thực hiện</th>
+                  <th class="py-3 px-4 w-32">Hành động</th>
+                  <th class="py-3 px-4">Chi tiết thao tác</th>
+                </tr>
+              </thead>
+              <tbody id="adminAuditLogsTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
+                <!-- Filled dynamically by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- Global Footer -->
@@ -727,6 +1234,7 @@
     // 1. Initial Load & Hydration
     async function initApp() {
       loadUserState();
+      initAuthData();
 
       try {
         let response = await fetch('/api/data');
@@ -744,9 +1252,13 @@
         }
       }
 
+      // Merge custom questions from storage
+      mergeCustomQuestions();
+
       // Update counters in UI
       const totalQ = APP_DATA.questions ? APP_DATA.questions.length : 277;
-      document.getElementById('totalQuestionsCount').innerText = totalQ;
+      const countEl = document.getElementById('totalQuestionsCount');
+      if (countEl) countEl.innerText = totalQ;
 
       // Initialize sections
       renderDashboard();
@@ -755,6 +1267,9 @@
       initStudy();
       initGlossary();
       renderMistakes();
+
+      // Initialize Auth & Admin UI
+      updateAuthUI();
 
       // Render Lucide icons
       lucide.createIcons();
@@ -801,20 +1316,37 @@
 
     // Tab Switching
     function switchTab(tabId) {
+      // Permission check for admin tab
+      if (tabId === 'admin' && (!currentUser || !['superadmin', 'admin', 'manager', 'staff'].includes(currentUser.role))) {
+        showToast('Vui lòng đăng nhập quyền Quản trị (Superadmin, Admin, Manager, Staff) để truy cập!', 'warning');
+        openLoginModal();
+        return;
+      }
+
       document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
       const target = document.getElementById('tab-' + tabId);
       if (target) target.classList.add('active');
 
       document.querySelectorAll('.nav-btn').forEach(btn => {
-        if (btn.getAttribute('data-tab') === tabId) {
-          btn.className = "nav-btn px-3 py-2 rounded-lg text-sm font-medium flex items-center space-x-1.5 transition-all text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50";
+        const isCurrent = btn.getAttribute('data-tab') === tabId;
+        if (btn.id === 'navAdminTab') {
+          if (isCurrent) {
+            btn.className = "nav-btn px-2.5 lg:px-3 py-1.5 rounded-lg text-xs lg:text-sm font-bold flex items-center space-x-1.5 whitespace-nowrap transition-all text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-700 shadow-sm shrink-0";
+          } else {
+            btn.className = "nav-btn px-2.5 lg:px-3 py-1.5 rounded-lg text-xs lg:text-sm font-bold flex items-center space-x-1.5 whitespace-nowrap transition-all text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 relative shrink-0 border border-amber-200/60 dark:border-amber-800/60";
+          }
         } else {
-          btn.className = "nav-btn px-3 py-2 rounded-lg text-sm font-medium flex items-center space-x-1.5 transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800";
+          if (isCurrent) {
+            btn.className = "nav-btn px-2.5 lg:px-3 py-1.5 rounded-lg text-xs lg:text-sm font-medium flex items-center space-x-1.5 whitespace-nowrap transition-all text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 shrink-0";
+          } else {
+            btn.className = "nav-btn px-2.5 lg:px-3 py-1.5 rounded-lg text-xs lg:text-sm font-medium flex items-center space-x-1.5 whitespace-nowrap transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 shrink-0";
+          }
         }
       });
 
       if (tabId === 'dashboard') updateDashboardStats();
       if (tabId === 'mistakes') renderMistakes();
+      if (tabId === 'admin') renderAdminDashboard();
 
       window.scrollTo({ top: 0, behavior: 'smooth' });
       lucide.createIcons();
@@ -1903,8 +2435,1200 @@
       return (text || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
     }
 
+    // ==========================================
+    // 10. AUTHENTICATION & RBAC LOGIC
+    // ==========================================
+    const DEFAULT_USERS = [
+      { id: "usr_superadmin", username: "superadmin", password: "123", fullName: "Nguyễn Quản Trị Tối Cao", role: "superadmin", levelName: "Super Admin (Tối cao)", roleBadge: "👑 Super Admin", avatar: "SA", color: "from-amber-500 to-red-600", email: "superadmin@isc2cc.vn", status: "active", created: "2026-10-01", lastLogin: "Vừa xong" },
+      { id: "usr_admin", username: "admin", password: "123", fullName: "Trần Chuyên Viên Bảo Mật", role: "admin", levelName: "Admin (Chuyên môn)", roleBadge: "🛡️ Admin", avatar: "AD", color: "from-blue-500 to-indigo-600", email: "admin@isc2cc.vn", status: "active", created: "2026-10-02", lastLogin: "Hôm nay" },
+      { id: "usr_manager", username: "manager", password: "123", fullName: "Lê Quản Lý Đào Tạo", role: "manager", levelName: "Manager (Quản lý)", roleBadge: "💼 Manager", avatar: "MG", color: "from-emerald-500 to-teal-600", email: "manager@isc2cc.vn", status: "active", created: "2026-10-02", lastLogin: "Hôm qua" },
+      { id: "usr_staff", username: "staff", password: "123", fullName: "Phạm Trợ Giảng Chuyên Đề", role: "staff", levelName: "Staff (Nhân viên/Trợ giảng)", roleBadge: "📋 Staff", avatar: "ST", color: "from-purple-500 to-pink-600", email: "staff@isc2cc.vn", status: "active", created: "2026-10-03", lastLogin: "Hôm qua" },
+      { id: "usr_student", username: "student", password: "123", fullName: "Đỗ Học Viên Chứng Chỉ CC", role: "student", levelName: "Student (Học viên)", roleBadge: "🎓 Student", avatar: "HV", color: "from-slate-500 to-slate-700", email: "student@isc2cc.vn", status: "active", created: "2026-10-03", lastLogin: "Hôm nay" }
+    ];
+
+    const DEFAULT_AUDIT_LOGS = [
+      { id: 1, time: "2026-10-04 11:15", user: "Nguyễn Quản Trị Tối Cao", role: "superadmin", roleBadge: "👑 Super Admin", action: "Khởi động Hệ thống", detail: "Khởi tạo hệ thống quản trị ISC2 CC với 277 câu hỏi và 4 cấp bậc RBAC." },
+      { id: 2, time: "2026-10-04 10:40", user: "Trần Chuyên Viên Bảo Mật", role: "admin", roleBadge: "🛡️ Admin", action: "Đăng nhập", detail: "Đăng nhập thành công vào Trung tâm Quản trị." },
+      { id: 3, time: "2026-10-04 09:12", user: "Lê Quản Lý Đào Tạo", role: "manager", roleBadge: "💼 Manager", action: "Cấu hình Đề thi", detail: "Cập nhật tham số đề thi mô phỏng 100 câu chuẩn ISC2 (120 phút)." },
+      { id: 4, time: "2026-10-03 16:30", user: "Phạm Trợ Giảng Chuyên Đề", role: "staff", roleBadge: "📋 Staff", action: "Cập nhật Giải thích", detail: "Bổ sung giải thích chi tiết cho câu hỏi Domain 4 Network Security." }
+    ];
+
+    let authUsers = [];
+    let currentUser = null;
+    let auditLogs = [];
+    let customQuestions = [];
+    let examSettings = { questionsCount: 100, duration: 120, passThreshold: 70 };
+    let adminQuestionsPage = 1;
+    const ADMIN_PAGE_SIZE = 15;
+    let userDropdownOpen = false;
+
+    function initAuthData() {
+      try {
+        const savedUsers = localStorage.getItem('isc2_users');
+        authUsers = savedUsers ? JSON.parse(savedUsers) : [...DEFAULT_USERS];
+      } catch (e) {
+        authUsers = [...DEFAULT_USERS];
+      }
+
+      try {
+        const savedCurrent = localStorage.getItem('isc2_current_user');
+        currentUser = savedCurrent ? JSON.parse(savedCurrent) : authUsers[0];
+      } catch (e) {
+        currentUser = authUsers[0];
+      }
+
+      try {
+        const savedLogs = localStorage.getItem('isc2_audit_logs');
+        auditLogs = savedLogs ? JSON.parse(savedLogs) : [...DEFAULT_AUDIT_LOGS];
+      } catch (e) {
+        auditLogs = [...DEFAULT_AUDIT_LOGS];
+      }
+
+      try {
+        const savedSettings = localStorage.getItem('isc2_exam_settings');
+        if (savedSettings) examSettings = JSON.parse(savedSettings);
+      } catch (e) {}
+
+      try {
+        const savedCustom = localStorage.getItem('isc2_custom_questions');
+        customQuestions = savedCustom ? JSON.parse(savedCustom) : [];
+      } catch (e) {
+        customQuestions = [];
+      }
+    }
+
+    function mergeCustomQuestions() {
+      if (!Array.isArray(customQuestions) || customQuestions.length === 0) return;
+      if (!APP_DATA.questions) APP_DATA.questions = [];
+      customQuestions.forEach(cq => {
+        const idx = APP_DATA.questions.findIndex(q => q.id === cq.id);
+        if (idx >= 0) {
+          APP_DATA.questions[idx] = cq;
+        } else {
+          APP_DATA.questions.push(cq);
+        }
+      });
+    }
+
+    function logAuditEvent(action, detail) {
+      const newLog = {
+        id: Date.now(),
+        time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date().toLocaleDateString('vi-VN'),
+        user: currentUser ? currentUser.fullName : 'Hệ thống',
+        role: currentUser ? currentUser.role : 'guest',
+        roleBadge: currentUser ? currentUser.roleBadge : 'Khách',
+        action,
+        detail
+      };
+      auditLogs.unshift(newLog);
+      if (auditLogs.length > 100) auditLogs.pop();
+      try {
+        localStorage.setItem('isc2_audit_logs', JSON.stringify(auditLogs));
+      } catch (e) {}
+    }
+
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toastNotification');
+      const msgEl = document.getElementById('toastMessage');
+      const icon = document.getElementById('toastIcon');
+      if (!toast || !msgEl) return;
+
+      msgEl.innerText = message;
+      toast.className = "fixed bottom-5 right-5 z-50 flex items-center space-x-2 px-4 py-3 rounded-2xl shadow-2xl text-xs font-bold text-white transition-all transform duration-200";
+      if (type === 'success') {
+        toast.classList.add('bg-emerald-600');
+        icon.setAttribute('data-lucide', 'check-circle-2');
+      } else if (type === 'warning') {
+        toast.classList.add('bg-amber-600');
+        icon.setAttribute('data-lucide', 'alert-triangle');
+      } else if (type === 'error') {
+        toast.classList.add('bg-red-600');
+        icon.setAttribute('data-lucide', 'alert-circle');
+      } else {
+        toast.classList.add('bg-indigo-600');
+        icon.setAttribute('data-lucide', 'info');
+      }
+      lucide.createIcons();
+
+      toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+      }, 3500);
+    }
+
+    function updateAuthUI() {
+      const container = document.getElementById('userWidgetContainer');
+      const adminNavBtn = document.getElementById('navAdminTab');
+      const mobileAdminNavBtn = document.getElementById('mobileNavAdminTab');
+      const navRoleBadge = document.getElementById('navRoleBadge');
+
+      if (!container) return;
+
+      const hasAdminAccess = currentUser && ['superadmin', 'admin', 'manager', 'staff'].includes(currentUser.role);
+
+      // 1. Update Navigation Tabs Visibility
+      if (hasAdminAccess) {
+        if (adminNavBtn) adminNavBtn.classList.remove('hidden');
+        if (mobileAdminNavBtn) mobileAdminNavBtn.classList.remove('hidden');
+        if (navRoleBadge) {
+          const badgeMap = {
+            superadmin: '👑 SA',
+            admin: '🛡️ AD',
+            manager: '💼 MG',
+            staff: '📋 ST'
+          };
+          navRoleBadge.innerText = badgeMap[currentUser.role] || 'ADMIN';
+        }
+      } else {
+        if (adminNavBtn) adminNavBtn.classList.add('hidden');
+        if (mobileAdminNavBtn) mobileAdminNavBtn.classList.add('hidden');
+      }
+
+      // 2. Update Header Widget
+      if (currentUser) {
+        const badgeColors = {
+          superadmin: 'from-amber-500 to-red-600 text-amber-600 dark:text-amber-400',
+          admin: 'from-blue-500 to-indigo-600 text-blue-600 dark:text-blue-400',
+          manager: 'from-emerald-500 to-teal-600 text-emerald-600 dark:text-emerald-400',
+          staff: 'from-purple-500 to-pink-600 text-purple-600 dark:text-purple-400',
+          student: 'from-slate-500 to-slate-700 text-slate-500 dark:text-slate-400'
+        };
+        const color = badgeColors[currentUser.role] || 'from-emerald-500 to-teal-600 text-emerald-600';
+
+        container.innerHTML = `
+          <div class="relative">
+            <button onclick="toggleUserDropdown()" class="flex items-center space-x-2 px-2.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+              <div class="w-7 h-7 rounded-lg bg-gradient-to-tr ${currentUser.color || 'from-emerald-500 to-teal-600'} text-white flex items-center justify-center font-bold text-xs shadow-sm shrink-0">
+                ${currentUser.avatar || 'US'}
+              </div>
+              <div class="text-left hidden lg:block leading-none">
+                <div class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate max-w-[120px]">${currentUser.fullName}</div>
+                <div class="text-[10px] font-bold mt-0.5 ${color.split(' ').slice(2).join(' ')}">${currentUser.roleBadge}</div>
+              </div>
+              <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400 shrink-0"></i>
+            </button>
+
+            <!-- Dropdown Menu -->
+            <div id="userDropdownMenu" class="absolute right-0 mt-2 w-64 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl p-2.5 space-y-2 z-50 hidden animate-in fade-in zoom-in-95 duration-150">
+              <div class="px-2.5 py-2 border-b border-slate-100 dark:border-slate-800">
+                <p class="text-xs font-bold text-slate-800 dark:text-white">${currentUser.fullName}</p>
+                <p class="text-[11px] text-slate-400 truncate">${currentUser.email || currentUser.username + '@isc2cc.vn'}</p>
+                <div class="mt-1.5 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 ${color.split(' ').slice(2).join(' ')}">
+                  ${currentUser.roleBadge}
+                </div>
+              </div>
+
+              ${hasAdminAccess ? `
+                <button onclick="switchTab('admin'); toggleUserDropdown();" class="w-full text-left px-2.5 py-2 rounded-xl text-xs font-bold text-amber-600 dark:text-amber-400 hover:bg-amber-50 dark:hover:bg-amber-950/40 flex items-center space-x-2 transition">
+                  <i data-lucide="shield-alert" class="w-4 h-4 text-amber-500"></i>
+                  <span>Bảng Quản trị Backend</span>
+                </button>
+              ` : ''}
+
+              <button onclick="openLoginModal(); toggleUserDropdown();" class="w-full text-left px-2.5 py-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center space-x-2 transition">
+                <i data-lucide="repeat" class="w-4 h-4 text-blue-500"></i>
+                <span>Chuyển đổi Cấp bậc (Demo)</span>
+              </button>
+
+              <div class="border-t border-slate-100 dark:border-slate-800 pt-1">
+                <button onclick="logoutUser()" class="w-full text-left px-2.5 py-2 rounded-xl text-xs font-semibold text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 flex items-center space-x-2 transition">
+                  <i data-lucide="log-out" class="w-4 h-4 text-red-500"></i>
+                  <span>Đăng xuất</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      } else {
+        container.innerHTML = `
+          <button onclick="openLoginModal()" class="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition">
+            <i data-lucide="log-in" class="w-3.5 h-3.5"></i>
+            <span class="whitespace-nowrap">Đăng nhập</span>
+          </button>
+        `;
+      }
+
+      // Update Admin tab header indicators if present
+      const adminUserName = document.getElementById('adminCurrentUserName');
+      const adminRoleBadgeContainer = document.getElementById('adminCurrentRoleBadgeContainer');
+      if (adminUserName && currentUser) {
+        adminUserName.innerText = currentUser.fullName;
+      }
+      if (adminRoleBadgeContainer && currentUser) {
+        adminRoleBadgeContainer.innerHTML = `
+          <span class="px-2.5 py-1 rounded-lg bg-gradient-to-r ${currentUser.color || 'from-amber-500 to-red-600'} text-white text-xs font-bold shadow-sm">
+            ${currentUser.roleBadge}
+          </span>
+        `;
+      }
+
+      lucide.createIcons();
+    }
+
+    function toggleUserDropdown() {
+      const menu = document.getElementById('userDropdownMenu');
+      if (menu) menu.classList.toggle('hidden');
+    }
+
+    // Close dropdown on outside click
+    document.addEventListener('click', function(e) {
+      const container = document.getElementById('userWidgetContainer');
+      const menu = document.getElementById('userDropdownMenu');
+      if (container && menu && !container.contains(e.target)) {
+        menu.classList.add('hidden');
+      }
+    });
+
+    function openLoginModal() {
+      const modal = document.getElementById('modalLogin');
+      if (modal) modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeLoginModal() {
+      const modal = document.getElementById('modalLogin');
+      if (modal) modal.classList.add('hidden');
+      const err = document.getElementById('loginErrorMessage');
+      if (err) err.classList.add('hidden');
+    }
+
+    function quickLoginRole(roleKey) {
+      let user = authUsers.find(u => u.role === roleKey);
+      if (!user) {
+        user = DEFAULT_USERS.find(u => u.role === roleKey) || DEFAULT_USERS[0];
+      }
+      user.lastLogin = "Vừa xong";
+      currentUser = user;
+      localStorage.setItem('isc2_current_user', JSON.stringify(currentUser));
+      logAuditEvent('Đăng nhập (1-Chạm)', `Đăng nhập vai trò ${user.roleBadge} (${user.fullName}).`);
+      showToast(`Đăng nhập thành công với vai trò ${user.roleBadge}!`, 'success');
+      updateAuthUI();
+      closeLoginModal();
+
+      if (['superadmin', 'admin', 'manager', 'staff'].includes(user.role)) {
+        renderAdminDashboard();
+      }
+    }
+
+    function handleFormLogin(e) {
+      e.preventDefault();
+      const usernameInput = document.getElementById('loginUsernameInput').value.trim().toLowerCase();
+      const passwordInput = document.getElementById('loginPasswordInput').value.trim();
+      const errEl = document.getElementById('loginErrorMessage');
+
+      const user = authUsers.find(u => u.username.toLowerCase() === usernameInput && u.password === passwordInput);
+      if (user) {
+        if (user.status === 'blocked') {
+          errEl.innerText = "Tài khoản của bạn đã bị khóa bởi Quản trị viên!";
+          errEl.classList.remove('hidden');
+          return;
+        }
+        user.lastLogin = "Vừa xong";
+        currentUser = user;
+        localStorage.setItem('isc2_current_user', JSON.stringify(currentUser));
+        logAuditEvent('Đăng nhập', `Đăng nhập tài khoản ${user.username} (${user.roleBadge}).`);
+        showToast(`Xin chào ${user.fullName} (${user.roleBadge})!`, 'success');
+        updateAuthUI();
+        closeLoginModal();
+        if (['superadmin', 'admin', 'manager', 'staff'].includes(user.role)) {
+          renderAdminDashboard();
+        }
+      } else {
+        errEl.innerText = "Tên đăng nhập hoặc mật khẩu không đúng!";
+        errEl.classList.remove('hidden');
+      }
+    }
+
+    function logoutUser() {
+      logAuditEvent('Đăng xuất', `Tài khoản ${currentUser ? currentUser.fullName : ''} đăng xuất.`);
+      currentUser = null;
+      localStorage.removeItem('isc2_current_user');
+      showToast('Đã đăng xuất tài khoản thành công!', 'info');
+      updateAuthUI();
+      switchTab('dashboard');
+    }
+
+    // ==========================================
+    // 11. ADMIN BACKEND DASHBOARD LOGIC
+    // ==========================================
+    function renderAdminDashboard() {
+      if (!currentUser || !['superadmin', 'admin', 'manager', 'staff'].includes(currentUser.role)) {
+        return;
+      }
+      renderAdminOverview();
+      renderAdminQuestionsList();
+      renderAdminUsersList();
+      renderAdminAuditLogs();
+      updateAdminButtonPermissions();
+      lucide.createIcons();
+    }
+
+    function switchAdminSubTab(subtabId) {
+      document.querySelectorAll('.admin-subtab-btn').forEach(btn => {
+        if (btn.getAttribute('data-subtab') === subtabId) {
+          btn.className = "admin-subtab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition bg-emerald-600 text-white shadow";
+        } else {
+          btn.className = "admin-subtab-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-bold flex items-center space-x-2 transition bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700";
+        }
+      });
+
+      document.querySelectorAll('.admin-subtab-content').forEach(c => c.classList.add('hidden'));
+      const target = document.getElementById('admin-subtab-' + subtabId);
+      if (target) target.classList.remove('hidden');
+
+      if (subtabId === 'questions') renderAdminQuestionsList();
+      if (subtabId === 'users') renderAdminUsersList();
+      if (subtabId === 'logs') renderAdminAuditLogs();
+
+      lucide.createIcons();
+    }
+
+    function updateAdminButtonPermissions() {
+      if (!currentUser) return;
+      const isSuper = currentUser.role === 'superadmin';
+      const isAdmin = currentUser.role === 'admin';
+      const isManager = currentUser.role === 'manager';
+
+      const btnAddUser = document.getElementById('adminBtnAddUser');
+      if (btnAddUser) {
+        if (isSuper || isAdmin) {
+          btnAddUser.classList.remove('hidden');
+        } else {
+          btnAddUser.classList.add('hidden');
+        }
+      }
+    }
+
+    function renderAdminOverview() {
+      const totalQ = APP_DATA.questions ? APP_DATA.questions.length : 277;
+      const totalUsers = authUsers.length;
+      const totalExams = (userState.mockExamsHistory ? userState.mockExamsHistory.length : 0) + 12;
+
+      let avgScore = 78.5;
+      if (userState.mockExamsHistory && userState.mockExamsHistory.length > 0) {
+        const sum = userState.mockExamsHistory.reduce((acc, h) => acc + (h.score || 0), 0);
+        avgScore = (sum / userState.mockExamsHistory.length).toFixed(1);
+      }
+
+      const qEl = document.getElementById('adminTotalQuestions');
+      const uEl = document.getElementById('adminTotalUsers');
+      const eEl = document.getElementById('adminExamAttempts');
+      const aEl = document.getElementById('adminAvgPassRate');
+
+      if (qEl) qEl.innerText = `${totalQ} câu`;
+      if (uEl) uEl.innerText = `${totalUsers} Users`;
+      if (eEl) eEl.innerText = `${totalExams} lượt`;
+      if (aEl) aEl.innerText = `${avgScore}%`;
+
+      // Render Permissions for Current User
+      const permList = document.getElementById('adminRolePermissionsList');
+      if (permList && currentUser) {
+        const permissions = {
+          superadmin: [
+            "✅ Toàn quyền Quản trị & Cấu hình Hệ thống",
+            "✅ Quản lý, thêm, sửa, xóa, phân quyền toàn bộ User",
+            "✅ Thêm, sửa, xóa câu hỏi ngân hàng đề thi",
+            "✅ Xuất / Nhập backup toàn bộ dữ liệu hệ thống",
+            "✅ Giám sát toàn bộ Nhật ký hoạt động (Audit Logs)"
+          ],
+          admin: [
+            "✅ Quản lý ngân hàng câu hỏi (Thêm, Sửa, Xóa)",
+            "✅ Quản lý tài khoản cấp dưới (Manager, Staff, Student)",
+            "✅ Cấu hình đề thi mô phỏng và bộ câu hỏi trọng tâm",
+            "✅ Xuất dữ liệu câu hỏi dạng JSON",
+            "✅ Giám sát nhật ký hoạt động hệ thống"
+          ],
+          manager: [
+            "✅ Theo dõi tiến độ & tỷ lệ đỗ của học viên",
+            "✅ Đóng góp & chỉnh sửa nội dung giải thích câu hỏi",
+            "✅ Cấu hình bộ đề thi thử và phân phối bài tập",
+            "👁️ Xem danh sách người dùng và nhân sự staff",
+            "❌ Không có quyền xóa câu hỏi hoặc xóa user"
+          ],
+          staff: [
+            "✅ Đóng góp câu hỏi mới và bổ sung giải thích chi tiết",
+            "✅ Hỗ trợ học viên trong quá trình luyện đề thi",
+            "👁️ Xem ngân hàng câu hỏi và tham chiếu giáo trình PDF",
+            "❌ Không có quyền xóa câu hỏi hoặc thay đổi quyền hạn"
+          ]
+        };
+
+        const list = permissions[currentUser.role] || permissions.staff;
+        permList.innerHTML = list.map(item => `
+          <div class="flex items-center space-x-2 py-1 border-b border-slate-100 dark:border-slate-800/60 last:border-0">
+            <span>${item}</span>
+          </div>
+        `).join('');
+      }
+    }
+
+    // 12. Question CRUD Logic
+    function renderAdminQuestionsList() {
+      const tbody = document.getElementById('adminQuestionsTableBody');
+      if (!tbody) return;
+
+      const searchTerm = (document.getElementById('adminQuestionSearch')?.value || '').toLowerCase().trim();
+      const domainFilter = document.getElementById('adminQuestionDomainFilter')?.value || 'all';
+
+      let questions = APP_DATA.questions || [];
+
+      if (domainFilter !== 'all') {
+        const dId = parseInt(domainFilter);
+        questions = questions.filter(q => q.domain_id === dId);
+      }
+
+      if (searchTerm) {
+        questions = questions.filter(q =>
+          (q.question || '').toLowerCase().includes(searchTerm) ||
+          (q.explanation || '').toLowerCase().includes(searchTerm) ||
+          (q.domain_name || '').toLowerCase().includes(searchTerm)
+        );
+      }
+
+      const totalFiltered = questions.length;
+      const totalPages = Math.ceil(totalFiltered / ADMIN_PAGE_SIZE) || 1;
+      if (adminQuestionsPage > totalPages) adminQuestionsPage = totalPages;
+      if (adminQuestionsPage < 1) adminQuestionsPage = 1;
+
+      const startIdx = (adminQuestionsPage - 1) * ADMIN_PAGE_SIZE;
+      const pageQuestions = questions.slice(startIdx, startIdx + ADMIN_PAGE_SIZE);
+
+      const infoEl = document.getElementById('adminQuestionsPaginationInfo');
+      if (infoEl) {
+        infoEl.innerText = `Hiển thị ${totalFiltered === 0 ? 0 : startIdx + 1}-${Math.min(startIdx + ADMIN_PAGE_SIZE, totalFiltered)} trên ${totalFiltered} câu hỏi`;
+      }
+
+      const canDelete = currentUser && ['superadmin', 'admin'].includes(currentUser.role);
+      const canEdit = currentUser && ['superadmin', 'admin', 'manager', 'staff'].includes(currentUser.role);
+
+      if (pageQuestions.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="py-8 text-center text-slate-400">
+              <i data-lucide="help-circle" class="w-8 h-8 mx-auto mb-2 opacity-50"></i>
+              Không tìm thấy câu hỏi nào phù hợp với điều kiện tìm kiếm.
+            </td>
+          </tr>
+        `;
+      } else {
+        tbody.innerHTML = pageQuestions.map((q, idx) => {
+          const rowNum = startIdx + idx + 1;
+          const domainShort = `Domain ${q.domain_id}`;
+          return `
+            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
+              <td class="py-3 px-4 font-bold text-slate-400">${rowNum}</td>
+              <td class="py-3 px-4">
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+                  ${domainShort}
+                </span>
+              </td>
+              <td class="py-3 px-4 max-w-md">
+                <p class="font-medium text-slate-800 dark:text-slate-200 line-clamp-2">${escapeHtml(q.question)}</p>
+                <p class="text-[11px] text-slate-400 line-clamp-1 mt-0.5">${escapeHtml(q.explanation)}</p>
+              </td>
+              <td class="py-3 px-4 text-center">
+                <span class="inline-flex items-center justify-center w-6 h-6 rounded-full font-bold text-xs bg-emerald-500 text-white">
+                  ${q.correct_option}
+                </span>
+              </td>
+              <td class="py-3 px-4 text-center font-medium text-slate-500">
+                Trang ${q.page || 1}
+              </td>
+              <td class="py-3 px-4 text-center">
+                <div class="flex items-center justify-center space-x-1">
+                  ${canEdit ? `
+                    <button onclick="openEditQuestionModal(${q.id})" title="Chỉnh sửa câu hỏi" class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-blue-600 dark:text-blue-400 transition">
+                      <i data-lucide="edit-3" class="w-4 h-4"></i>
+                    </button>
+                  ` : ''}
+                  ${canDelete ? `
+                    <button onclick="deleteQuestion(${q.id})" title="Xóa câu hỏi" class="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/40 text-red-500 transition">
+                      <i data-lucide="trash" class="w-4 h-4"></i>
+                    </button>
+                  ` : `
+                    <span title="Chỉ Super Admin & Admin mới có quyền xóa" class="p-1.5 text-slate-300 dark:text-slate-700 cursor-not-allowed">
+                      <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+                    </span>
+                  `}
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      // Pagination Buttons
+      const btnsContainer = document.getElementById('adminQuestionsPaginationBtns');
+      if (btnsContainer) {
+        btnsContainer.innerHTML = `
+          <button onclick="changeAdminPage(${adminQuestionsPage - 1})" ${adminQuestionsPage <= 1 ? 'disabled class="opacity-40 cursor-not-allowed px-2.5 py-1 rounded border border-slate-200 dark:border-slate-800 text-xs"' : 'class="px-2.5 py-1 rounded border border-slate-200 dark:border-slate-800 text-xs hover:bg-slate-100 dark:hover:bg-slate-800"'}>
+            Trước
+          </button>
+          <span class="px-2 font-bold text-xs">${adminQuestionsPage} / ${totalPages}</span>
+          <button onclick="changeAdminPage(${adminQuestionsPage + 1})" ${adminQuestionsPage >= totalPages ? 'disabled class="opacity-40 cursor-not-allowed px-2.5 py-1 rounded border border-slate-200 dark:border-slate-800 text-xs"' : 'class="px-2.5 py-1 rounded border border-slate-200 dark:border-slate-800 text-xs hover:bg-slate-100 dark:hover:bg-slate-800"'}>
+            Sau
+          </button>
+        `;
+      }
+
+      lucide.createIcons();
+    }
+
+    function changeAdminPage(newPage) {
+      adminQuestionsPage = newPage;
+      renderAdminQuestionsList();
+    }
+
+    function openQuestionModal() {
+      const modal = document.getElementById('modalQuestion');
+      if (!modal) return;
+      document.getElementById('modalQuestionTitle').innerText = "Thêm câu hỏi mới vào Ngân hàng";
+      document.getElementById('editQuestionId').value = "";
+      document.getElementById('inputQuestionDomain').value = "1";
+      document.getElementById('inputQuestionPage').value = "1";
+      document.getElementById('inputQuestionText').value = "";
+      document.getElementById('inputOptionA').value = "";
+      document.getElementById('inputOptionB').value = "";
+      document.getElementById('inputOptionC').value = "";
+      document.getElementById('inputOptionD').value = "";
+      document.getElementById('inputCorrectOption').value = "A";
+      document.getElementById('inputQuestionExplanation').value = "";
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function openEditQuestionModal(qId) {
+      const q = (APP_DATA.questions || []).find(item => item.id === qId);
+      if (!q) return;
+
+      const modal = document.getElementById('modalQuestion');
+      if (!modal) return;
+      document.getElementById('modalQuestionTitle').innerText = `Chỉnh sửa câu hỏi #${q.id}`;
+      document.getElementById('editQuestionId').value = q.id;
+      document.getElementById('inputQuestionDomain').value = q.domain_id || 1;
+      document.getElementById('inputQuestionPage').value = q.page || 1;
+      document.getElementById('inputQuestionText').value = q.question || "";
+      
+      const opts = Array.isArray(q.options) ? q.options : Object.values(q.options || {});
+      document.getElementById('inputOptionA').value = opts[0] || "";
+      document.getElementById('inputOptionB').value = opts[1] || "";
+      document.getElementById('inputOptionC').value = opts[2] || "";
+      document.getElementById('inputOptionD').value = opts[3] || "";
+
+      document.getElementById('inputCorrectOption').value = q.correct_option || "A";
+      document.getElementById('inputQuestionExplanation').value = q.explanation || "";
+
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeQuestionModal() {
+      const modal = document.getElementById('modalQuestion');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function handleSaveQuestion(e) {
+      e.preventDefault();
+      const editId = document.getElementById('editQuestionId').value;
+      const domainId = parseInt(document.getElementById('inputQuestionDomain').value);
+      const page = parseInt(document.getElementById('inputQuestionPage').value) || 1;
+      const questionText = document.getElementById('inputQuestionText').value.trim();
+      const optA = document.getElementById('inputOptionA').value.trim();
+      const optB = document.getElementById('inputOptionB').value.trim();
+      const optC = document.getElementById('inputOptionC').value.trim();
+      const optD = document.getElementById('inputOptionD').value.trim();
+      const correctOpt = document.getElementById('inputCorrectOption').value;
+      const explanation = document.getElementById('inputQuestionExplanation').value.trim();
+
+      const domainNames = {
+        1: "Domain 1: Security Principles",
+        2: "Domain 2: Business Continuity, Disaster Recovery & Incident Response",
+        3: "Domain 3: Access Controls Concepts",
+        4: "Domain 4: Network Security",
+        5: "Domain 5: Security Operations"
+      };
+
+      if (editId) {
+        // Edit existing
+        const qId = parseInt(editId);
+        const q = APP_DATA.questions.find(item => item.id === qId);
+        if (q) {
+          q.domain_id = domainId;
+          q.domain_name = domainNames[domainId] || `Domain ${domainId}`;
+          q.page = page;
+          q.question = questionText;
+          q.options = [optA, optB, optC, optD];
+          q.correct_option = correctOpt;
+          q.explanation = explanation;
+
+          // Save to custom questions
+          const cqIdx = customQuestions.findIndex(item => item.id === qId);
+          if (cqIdx >= 0) customQuestions[cqIdx] = q;
+          else customQuestions.push(q);
+
+          localStorage.setItem('isc2_custom_questions', JSON.stringify(customQuestions));
+          logAuditEvent('Chỉnh sửa Câu hỏi', `Cập nhật câu hỏi #${qId} (Domain ${domainId}).`);
+          showToast(`Đã cập nhật thành công câu hỏi #${qId}!`, 'success');
+        }
+      } else {
+        // Add new
+        const newId = (APP_DATA.questions.reduce((max, item) => Math.max(max, item.id || 0), 0) || 277) + 1;
+        const newQ = {
+          id: newId,
+          domain_id: domainId,
+          domain_name: domainNames[domainId] || `Domain ${domainId}`,
+          page: page,
+          question: questionText,
+          options: [optA, optB, optC, optD],
+          correct_option: correctOpt,
+          explanation: explanation
+        };
+
+        APP_DATA.questions.push(newQ);
+        customQuestions.push(newQ);
+        localStorage.setItem('isc2_custom_questions', JSON.stringify(customQuestions));
+
+        const countEl = document.getElementById('totalQuestionsCount');
+        if (countEl) countEl.innerText = APP_DATA.questions.length;
+
+        logAuditEvent('Thêm mới Câu hỏi', `Tạo câu hỏi mới #${newId} vào Domain ${domainId}.`);
+        showToast(`Đã thêm thành công câu hỏi mới #${newId}!`, 'success');
+      }
+
+      closeQuestionModal();
+      renderAdminQuestionsList();
+      renderAdminOverview();
+    }
+
+    function deleteQuestion(qId) {
+      if (!currentUser || !['superadmin', 'admin'].includes(currentUser.role)) {
+        showToast('Chỉ Super Admin & Admin mới có quyền xóa câu hỏi!', 'error');
+        return;
+      }
+
+      if (!confirm(`Bạn có chắc chắn muốn xóa câu hỏi #${qId} khỏi ngân hàng câu hỏi?`)) return;
+
+      const idx = APP_DATA.questions.findIndex(q => q.id === qId);
+      if (idx >= 0) {
+        APP_DATA.questions.splice(idx, 1);
+        customQuestions = customQuestions.filter(q => q.id !== qId);
+        localStorage.setItem('isc2_custom_questions', JSON.stringify(customQuestions));
+
+        const countEl = document.getElementById('totalQuestionsCount');
+        if (countEl) countEl.innerText = APP_DATA.questions.length;
+
+        logAuditEvent('Xóa Câu hỏi', `Đã xóa câu hỏi #${qId} khỏi hệ thống.`);
+        showToast(`Đã xóa câu hỏi #${qId} thành công!`, 'info');
+        renderAdminQuestionsList();
+        renderAdminOverview();
+      }
+    }
+
+    // 13. Users Management & RBAC Logic
+    function renderAdminUsersList() {
+      const tbody = document.getElementById('adminUsersTableBody');
+      if (!tbody) return;
+
+      const isSuper = currentUser && currentUser.role === 'superadmin';
+      const isAdmin = currentUser && currentUser.role === 'admin';
+
+      const roleBadgeMap = {
+        superadmin: '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border border-amber-300/40">👑 Super Admin</span>',
+        admin: '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-300/40">🛡️ Admin</span>',
+        manager: '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-300/40">💼 Manager</span>',
+        staff: '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border border-purple-300/40">📋 Staff</span>',
+        student: '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300/40">🎓 Student</span>'
+      };
+
+      tbody.innerHTML = authUsers.map(u => {
+        const isCurrent = currentUser && currentUser.id === u.id;
+        const canManage = isSuper || (isAdmin && ['manager', 'staff', 'student'].includes(u.role));
+
+        return `
+          <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
+            <td class="py-3 px-4">
+              <div class="flex items-center space-x-3">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr ${u.color || 'from-emerald-500 to-teal-600'} text-white flex items-center justify-center font-bold text-xs shadow-sm">
+                  ${u.avatar || u.username.slice(0, 2).toUpperCase()}
+                </div>
+                <div>
+                  <div class="font-bold text-slate-800 dark:text-slate-200 flex items-center space-x-1.5">
+                    <span>${u.fullName}</span>
+                    ${isCurrent ? '<span class="text-[9px] px-1.5 py-0.2 bg-emerald-500 text-white rounded font-bold">Bạn</span>' : ''}
+                  </div>
+                  <div class="text-[11px] text-slate-400">${u.email || u.username + '@isc2cc.vn'}</div>
+                </div>
+              </div>
+            </td>
+            <td class="py-3 px-4 font-mono font-semibold text-slate-600 dark:text-slate-300">${u.username}</td>
+            <td class="py-3 px-4">${roleBadgeMap[u.role] || u.role}</td>
+            <td class="py-3 px-4 text-center">
+              ${u.status === 'active' 
+                ? '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">● Hoạt động</span>' 
+                : '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400">● Đã khóa</span>'
+              }
+            </td>
+            <td class="py-3 px-4 text-slate-400 text-[11px]">${u.lastLogin || 'Chưa đăng nhập'}</td>
+            <td class="py-3 px-4 text-center">
+              ${canManage && !isCurrent ? `
+                <div class="flex items-center justify-center space-x-1">
+                  <select onchange="changeUserRole('${u.id}', this.value)" class="px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-[11px] font-semibold">
+                    ${isSuper ? '<option value="superadmin" ' + (u.role === 'superadmin' ? 'selected' : '') + '>Super Admin</option>' : ''}
+                    <option value="admin" ${u.role === 'admin' ? 'selected' : ''}>Admin</option>
+                    <option value="manager" ${u.role === 'manager' ? 'selected' : ''}>Manager</option>
+                    <option value="staff" ${u.role === 'staff' ? 'selected' : ''}>Staff</option>
+                    <option value="student" ${u.role === 'student' ? 'selected' : ''}>Student</option>
+                  </select>
+                  <button onclick="toggleUserStatus('${u.id}')" title="${u.status === 'active' ? 'Khóa tài khoản' : 'Kích hoạt tài khoản'}" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500">
+                    <i data-lucide="${u.status === 'active' ? 'user-x' : 'user-check'}" class="w-3.5 h-3.5"></i>
+                  </button>
+                  ${isSuper && u.username !== 'superadmin' ? `
+                    <button onclick="deleteUser('${u.id}')" title="Xóa tài khoản" class="p-1 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/40 text-red-500">
+                      <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                    </button>
+                  ` : ''}
+                </div>
+              ` : `
+                <span class="text-[11px] text-slate-400 italic">${isCurrent ? 'Tài khoản hiện tại' : 'Chỉ xem'}</span>
+              `}
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    function openUserModal() {
+      const modal = document.getElementById('modalUser');
+      if (!modal) return;
+      document.getElementById('inputUserUsername').value = "";
+      document.getElementById('inputUserFullName').value = "";
+      document.getElementById('inputUserEmail').value = "";
+      document.getElementById('inputUserPassword').value = "123";
+      document.getElementById('inputUserRole').value = "staff";
+      modal.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeUserModal() {
+      const modal = document.getElementById('modalUser');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function handleSaveUser(e) {
+      e.preventDefault();
+      const username = document.getElementById('inputUserUsername').value.trim().toLowerCase();
+      const fullName = document.getElementById('inputUserFullName').value.trim();
+      const email = document.getElementById('inputUserEmail').value.trim();
+      const password = document.getElementById('inputUserPassword').value.trim();
+      const role = document.getElementById('inputUserRole').value;
+
+      if (authUsers.some(u => u.username.toLowerCase() === username)) {
+        showToast('Tên đăng nhập này đã tồn tại, vui lòng chọn tên khác!', 'error');
+        return;
+      }
+
+      const roleBadges = {
+        superadmin: "👑 Super Admin",
+        admin: "🛡️ Admin",
+        manager: "💼 Manager",
+        staff: "📋 Staff",
+        student: "🎓 Student"
+      };
+
+      const roleColors = {
+        superadmin: "from-amber-500 to-red-600",
+        admin: "from-blue-500 to-indigo-600",
+        manager: "from-emerald-500 to-teal-600",
+        staff: "from-purple-500 to-pink-600",
+        student: "from-slate-500 to-slate-700"
+      };
+
+      const newUser = {
+        id: "usr_" + Date.now(),
+        username,
+        password: password || "123",
+        fullName,
+        role,
+        levelName: roleBadges[role],
+        roleBadge: roleBadges[role],
+        avatar: username.slice(0, 2).toUpperCase(),
+        color: roleColors[role] || "from-slate-500 to-slate-700",
+        email: email || `${username}@isc2cc.vn`,
+        status: "active",
+        created: new Date().toISOString().split('T')[0],
+        lastLogin: "Chưa đăng nhập"
+      };
+
+      authUsers.push(newUser);
+      localStorage.setItem('isc2_users', JSON.stringify(authUsers));
+      logAuditEvent('Thêm Người dùng', `Tạo tài khoản mới ${username} (${roleBadges[role]}).`);
+      showToast(`Đã tạo tài khoản ${fullName} thành công!`, 'success');
+      closeUserModal();
+      renderAdminUsersList();
+      renderAdminOverview();
+    }
+
+    function toggleUserStatus(userId) {
+      const user = authUsers.find(u => u.id === userId);
+      if (!user) return;
+      user.status = user.status === 'active' ? 'blocked' : 'active';
+      localStorage.setItem('isc2_users', JSON.stringify(authUsers));
+      logAuditEvent('Thay đổi Trạng thái User', `${user.status === 'active' ? 'Mở khóa' : 'Khóa'} tài khoản ${user.username}.`);
+      showToast(`Đã ${user.status === 'active' ? 'kích hoạt' : 'khóa'} tài khoản ${user.username}!`, 'info');
+      renderAdminUsersList();
+    }
+
+    function changeUserRole(userId, newRole) {
+      const user = authUsers.find(u => u.id === userId);
+      if (!user) return;
+      const oldRole = user.role;
+      user.role = newRole;
+
+      const roleBadges = {
+        superadmin: "👑 Super Admin",
+        admin: "🛡️ Admin",
+        manager: "💼 Manager",
+        staff: "📋 Staff",
+        student: "🎓 Student"
+      };
+      user.roleBadge = roleBadges[newRole];
+
+      localStorage.setItem('isc2_users', JSON.stringify(authUsers));
+      logAuditEvent('Phân quyền User', `Đổi vai trò của ${user.username} từ ${oldRole} sang ${newRole}.`);
+      showToast(`Đã cập nhật vai trò ${user.username} thành ${roleBadges[newRole]}!`, 'success');
+      renderAdminUsersList();
+    }
+
+    function deleteUser(userId) {
+      if (!confirm('Bạn có chắc chắn muốn xóa vĩnh viễn tài khoản này?')) return;
+      const idx = authUsers.findIndex(u => u.id === userId);
+      if (idx >= 0) {
+        const u = authUsers[idx];
+        authUsers.splice(idx, 1);
+        localStorage.setItem('isc2_users', JSON.stringify(authUsers));
+        logAuditEvent('Xóa Người dùng', `Đã xóa tài khoản ${u.username}.`);
+        showToast(`Đã xóa tài khoản ${u.username}!`, 'info');
+        renderAdminUsersList();
+        renderAdminOverview();
+      }
+    }
+
+    // 14. Settings & Audit Logs Logic
+    function saveExamSettings() {
+      const count = parseInt(document.getElementById('configExamQuestionsCount').value) || 100;
+      const duration = parseInt(document.getElementById('configExamDuration').value) || 120;
+      const pass = parseInt(document.getElementById('configExamPassThreshold').value) || 70;
+
+      examSettings = { questionsCount: count, duration, passThreshold: pass };
+      localStorage.setItem('isc2_exam_settings', JSON.stringify(examSettings));
+
+      // Also update active exam state parameters
+      examState.totalQuestions = count;
+      examState.timerSeconds = duration * 60;
+
+      logAuditEvent('Cấu hình Đề thi', `Cập nhật: ${count} câu, ${duration} phút, điểm đạt ${pass}%.`);
+      showToast('Đã lưu cấu hình đề thi thành công!', 'success');
+    }
+
+    function renderAdminAuditLogs() {
+      const tbody = document.getElementById('adminAuditLogsTableBody');
+      if (!tbody) return;
+
+      tbody.innerHTML = auditLogs.map(log => `
+        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
+          <td class="py-2.5 px-4 font-mono text-[11px] text-slate-400">${log.time}</td>
+          <td class="py-2.5 px-4">
+            <div class="font-bold text-slate-700 dark:text-slate-300 text-xs">${log.user}</div>
+            <div class="text-[10px] text-slate-400">${log.roleBadge}</div>
+          </td>
+          <td class="py-2.5 px-4">
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+              ${log.action}
+            </span>
+          </td>
+          <td class="py-2.5 px-4 text-xs text-slate-600 dark:text-slate-400">${log.detail}</td>
+        </tr>
+      `).join('');
+    }
+
+    function clearAuditLogs() {
+      if (!confirm('Xóa toàn bộ nhật ký hoạt động?')) return;
+      auditLogs = [];
+      localStorage.removeItem('isc2_audit_logs');
+      renderAdminAuditLogs();
+      showToast('Đã xóa sạch nhật ký hoạt động!', 'info');
+    }
+
+    function exportQuestionsJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(APP_DATA.questions, null, 2));
+      const dl = document.createElement('a');
+      dl.setAttribute("href", dataStr);
+      dl.setAttribute("download", `isc2_questions_export_${Date.now()}.json`);
+      dl.click();
+      logAuditEvent('Xuất dữ liệu', 'Xuất toàn bộ ngân hàng câu hỏi ra file JSON.');
+      showToast('Đã xuất thành công ngân hàng câu hỏi!', 'success');
+    }
+
+    function exportFullBackupJSON() {
+      const fullBackup = {
+        questions: APP_DATA.questions,
+        users: authUsers,
+        auditLogs: auditLogs,
+        examSettings: examSettings,
+        timestamp: new Date().toISOString()
+      };
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fullBackup, null, 2));
+      const dl = document.createElement('a');
+      dl.setAttribute("href", dataStr);
+      dl.setAttribute("download", `isc2_full_backup_${Date.now()}.json`);
+      dl.click();
+      logAuditEvent('Sao lưu Hệ thống', 'Tải tệp sao lưu toàn diện hệ thống ISC2 CC.');
+      showToast('Đã tải tệp sao lưu thành công!', 'success');
+    }
+
+    function resetDefaultQuestions() {
+      if (!confirm('Khôi phục ngân hàng câu hỏi về 277 câu gốc? Các câu hỏi tự thêm sẽ bị xóa!')) return;
+      customQuestions = [];
+      localStorage.removeItem('isc2_custom_questions');
+      location.reload();
+    }
+
+    function clearLearningProgress() {
+      if (!confirm('Bạn có chắc muốn xóa sạch toàn bộ lịch sử luyện tập & thi thử?')) return;
+      localStorage.removeItem('isc2_user_state');
+      location.reload();
+    }
+
+
     // Start on DOM ready
     window.addEventListener('DOMContentLoaded', initApp);
   </script>
+
+  <!-- ========================================== -->
+  <!-- MODAL: USER LOGIN & QUICK SWITCH -->
+  <!-- ========================================== -->
+  <div id="modalLogin" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-5 animate-in fade-in zoom-in-95 duration-150">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div class="flex items-center space-x-2">
+          <div class="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-600 flex items-center justify-center font-bold">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base text-slate-800 dark:text-white">Đăng nhập Hệ thống</h3>
+            <p class="text-[11px] text-slate-400">Chọn cấp bậc quản trị hoặc đăng nhập thủ công</p>
+          </div>
+        </div>
+        <button onclick="closeLoginModal()" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Quick 1-Click Role Switch Buttons -->
+      <div class="space-y-2">
+        <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider">⚡ Đăng nhập nhanh 1-chạm (Demo Roles)</label>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="quickLoginRole('superadmin')" class="p-2.5 rounded-xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/50 dark:bg-amber-950/30 hover:bg-amber-100 text-left transition flex items-center space-x-2">
+            <span class="text-base">👑</span>
+            <div>
+              <div class="text-xs font-bold text-amber-700 dark:text-amber-300 leading-tight">Super Admin</div>
+              <div class="text-[10px] text-amber-600/80 dark:text-amber-400/80">Toàn quyền tối cao</div>
+            </div>
+          </button>
+          <button onclick="quickLoginRole('admin')" class="p-2.5 rounded-xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/50 dark:bg-blue-950/30 hover:bg-blue-100 text-left transition flex items-center space-x-2">
+            <span class="text-base">🛡️</span>
+            <div>
+              <div class="text-xs font-bold text-blue-700 dark:text-blue-300 leading-tight">Admin</div>
+              <div class="text-[10px] text-blue-600/80 dark:text-blue-400/80">Quản lý câu hỏi</div>
+            </div>
+          </button>
+          <button onclick="quickLoginRole('manager')" class="p-2.5 rounded-xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/50 dark:bg-emerald-950/30 hover:bg-emerald-100 text-left transition flex items-center space-x-2">
+            <span class="text-base">💼</span>
+            <div>
+              <div class="text-xs font-bold text-emerald-700 dark:text-emerald-300 leading-tight">Manager</div>
+              <div class="text-[10px] text-emerald-600/80 dark:text-emerald-400/80">Quản lý đào tạo</div>
+            </div>
+          </button>
+          <button onclick="quickLoginRole('staff')" class="p-2.5 rounded-xl border border-purple-200 dark:border-purple-900/60 bg-purple-50/50 dark:bg-purple-950/30 hover:bg-purple-100 text-left transition flex items-center space-x-2">
+            <span class="text-base">📋</span>
+            <div>
+              <div class="text-xs font-bold text-purple-700 dark:text-purple-300 leading-tight">Staff</div>
+              <div class="text-[10px] text-purple-600/80 dark:text-purple-400/80">Trợ giảng & hỗ trợ</div>
+            </div>
+          </button>
+        </div>
+        <button onclick="quickLoginRole('student')" class="w-full p-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/40 hover:bg-slate-100 text-center transition text-xs font-semibold text-slate-600 dark:text-slate-300 flex items-center justify-center space-x-1.5">
+          <span>🎓 Đăng nhập Học viên (Student Candidate)</span>
+        </button>
+      </div>
+
+      <div class="relative flex py-1 items-center">
+        <div class="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
+        <span class="flex-shrink mx-2 text-[10px] uppercase text-slate-400 font-semibold">Hoặc nhập tài khoản</span>
+        <div class="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
+      </div>
+
+      <!-- Traditional Credentials Form -->
+      <form onsubmit="handleFormLogin(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Tên đăng nhập</label>
+          <input type="text" id="loginUsernameInput" required placeholder="superadmin / admin / manager / staff" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">Mật khẩu</label>
+          <input type="password" id="loginPasswordInput" required placeholder="Mặc định: 123" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+        </div>
+        <p id="loginErrorMessage" class="text-[11px] text-red-500 hidden font-medium"></p>
+        <button type="submit" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition">
+          Đăng nhập
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: ADD / EDIT QUESTION -->
+  <!-- ========================================== -->
+  <div id="modalQuestion" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden overflow-y-auto">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4 my-8">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <h3 id="modalQuestionTitle" class="font-bold text-base text-slate-800 dark:text-white">Thêm câu hỏi mới</h3>
+        <button onclick="closeQuestionModal()" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleSaveQuestion(event)" class="space-y-4">
+        <input type="hidden" id="editQuestionId">
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Domain kiến thức</label>
+            <select id="inputQuestionDomain" required class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs">
+              <option value="1">Domain 1: Security Principles (Nguyên lý ATTT)</option>
+              <option value="2">Domain 2: Business Continuity, Disaster Recovery & Incident Response</option>
+              <option value="3">Domain 3: Access Controls Concepts (Kiểm soát truy cập)</option>
+              <option value="4">Domain 4: Network Security (An toàn mạng)</option>
+              <option value="5">Domain 5: Security Operations (Hoạt động an ninh)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Trang tham chiếu giáo trình (PDF)</label>
+            <input type="number" id="inputQuestionPage" value="1" min="1" max="600" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Nội dung câu hỏi</label>
+          <textarea id="inputQuestionText" rows="3" required placeholder="Nhập câu hỏi theo chuẩn đề thi ISC2 CC..." class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs focus:ring-2 focus:ring-emerald-500"></textarea>
+        </div>
+
+        <div class="space-y-2">
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">4 Phương án trả lời</label>
+          <div class="flex items-center space-x-2">
+            <span class="w-6 font-bold text-xs text-slate-500">A.</span>
+            <input type="text" id="inputOptionA" required placeholder="Phương án A" class="flex-1 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs">
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="w-6 font-bold text-xs text-slate-500">B.</span>
+            <input type="text" id="inputOptionB" required placeholder="Phương án B" class="flex-1 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs">
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="w-6 font-bold text-xs text-slate-500">C.</span>
+            <input type="text" id="inputOptionC" required placeholder="Phương án C" class="flex-1 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs">
+          </div>
+          <div class="flex items-center space-x-2">
+            <span class="w-6 font-bold text-xs text-slate-500">D.</span>
+            <input type="text" id="inputOptionD" required placeholder="Phương án D" class="flex-1 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Đáp án đúng</label>
+          <select id="inputCorrectOption" required class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold text-emerald-600">
+            <option value="A">Đáp án A</option>
+            <option value="B">Đáp án B</option>
+            <option value="C">Đáp án C</option>
+            <option value="D">Đáp án D</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Giải thích chi tiết (Tiếng Việt)</label>
+          <textarea id="inputQuestionExplanation" rows="3" required placeholder="Giải thích lý do tại sao đáp án này đúng và liên hệ tài liệu ISC2 CC..." class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs focus:ring-2 focus:ring-emerald-500"></textarea>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+          <button type="button" onclick="closeQuestionModal()" class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100">
+            Hủy bỏ
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow transition">
+            Lưu câu hỏi
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- MODAL: ADD / EDIT USER & RBAC ROLE -->
+  <!-- ========================================== -->
+  <div id="modalUser" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <h3 id="modalUserTitle" class="font-bold text-base text-slate-800 dark:text-white">Thêm tài khoản người dùng</h3>
+        <button onclick="closeUserModal()" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form onsubmit="handleSaveUser(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Tên đăng nhập (Username)</label>
+          <input type="text" id="inputUserUsername" required placeholder="vd: nguyen.van.a" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs focus:ring-2 focus:ring-purple-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Họ và tên</label>
+          <input type="text" id="inputUserFullName" required placeholder="vd: Nguyễn Văn A" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs focus:ring-2 focus:ring-purple-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Email</label>
+          <input type="email" id="inputUserEmail" placeholder="vd: nva@isc2cc.vn" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs focus:ring-2 focus:ring-purple-500">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Mật khẩu</label>
+          <input type="password" id="inputUserPassword" value="123" required class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs focus:ring-2 focus:ring-purple-500">
+          <span class="text-[10px] text-slate-400">Mặc định: 123</span>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Cấp bậc / Role (Phân quyền)</label>
+          <select id="inputUserRole" required class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs font-bold">
+            <option value="superadmin">👑 Super Admin (Tối cao - Toàn quyền)</option>
+            <option value="admin">🛡️ Admin (Chuyên môn - Quản lý câu hỏi & đề thi)</option>
+            <option value="manager">💼 Manager (Quản lý - Giám sát tiến độ & đề thi)</option>
+            <option value="staff" selected>📋 Staff (Nhân viên - Trợ giảng & hỗ trợ nội dung)</option>
+            <option value="student">🎓 Student (Học viên - Luyện thi CC)</option>
+          </select>
+        </div>
+
+        <div class="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+          <button type="button" onclick="closeUserModal()" class="px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-100">
+            Hủy bỏ
+          </button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs shadow transition">
+            Tạo tài khoản
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastNotification" class="fixed bottom-5 right-5 z-50 flex items-center space-x-2 px-4 py-3 rounded-2xl shadow-xl text-xs font-bold text-white transition-all transform translate-y-20 opacity-0 pointer-events-none duration-200">
+    <i id="toastIcon" data-lucide="check-circle" class="w-4 h-4"></i>
+    <span id="toastMessage">Thông báo</span>
+  </div>
 </body>
 </html>

@@ -74,8 +74,24 @@ python app.py
 - Hệ thống tự động ghi nhớ các câu hỏi bạn từng làm sai.
 - Chế độ luyện tập riêng cho danh sách câu sai để biến điểm yếu thành điểm mạnh trước ngày thi chính thức.
 
-### 8. 📕 Tích hợp trực tiếp Sách gốc PDF
-- Nút "Mở PDF" trên thanh menu cho phép mở trực tiếp file `Certified in Cybersecurity (CC) Exam Guide.pdf` ngay trên trình duyệt để đối chiếu nội dung gốc bất kỳ lúc nào.
+### 8. 🛡️ Bảng điều khiển Quản trị Backend & Phân quyền Người dùng (RBAC Dashboard)
+Ứng dụng trang bị hệ thống phân quyền 4 cấp bậc quản trị chuyên nghiệp kết hợp nguyên tắc *Đặc quyền tối thiểu (Least Privilege)* chuẩn ISC2:
+
+| Cấp bậc (Level) | Quyền hạn chính | Tài khoản mẫu (Mật khẩu: `123`) |
+|---|---|---|
+| 👑 **Super Admin** | Toàn quyền tối cao hệ thống: Quản lý & phân quyền User, Thêm/Sửa/Xóa câu hỏi, Cấu hình đề thi, Xuất/Nhập backup JSON, Giám sát Audit Logs | `superadmin` / `123` |
+| 🛡️ **Admin** | Quản lý ngân hàng câu hỏi (Thêm, Sửa, Xóa), Quản lý tài khoản cấp dưới (Manager, Staff, Student), Xuất dữ liệu JSON | `admin` / `123` |
+| 💼 **Manager** | Theo dõi tiến độ học tập, Cấu hình bộ đề thi mô phỏng, Đóng góp & sửa giải thích câu hỏi | `manager` / `123` |
+| 📋 **Staff** | Trợ giảng & hỗ trợ học viên, Đóng góp câu hỏi mới và bổ sung tài liệu tham khảo | `staff` / `123` |
+| 🎓 **Student** | Người học / Ứng viên thi chứng chỉ: Làm bài luyện tập, thi thử, học flashcards | `student` / `123` |
+
+- **Tính năng nổi bật trong Backend Dashboard**:
+  - **⚡ Đăng nhập 1-chạm (1-Click Demo Login)**: Chuyển đổi vai trò linh hoạt giữa các cấp quản trị.
+  - **📊 Thống kê KPI & Tỷ lệ 5 Domain**: Biểu đồ phân bổ câu hỏi và tỷ lệ đỗ trung bình.
+  - **❓ Quản lý Ngân hàng Câu hỏi (CRUD)**: Tìm kiếm realtime, phân trang, thêm mới, sửa, xóa câu hỏi.
+  - **👥 Quản lý Người dùng & Ma trận RBAC**: Thêm tài khoản mới, đổi cấp bậc, khóa/kích hoạt user, xem ma trận quyền hạn chi tiết.
+  - **⚙️ Cấu hình Đề thi & Tham số**: Tùy chỉnh số câu hỏi (100/50/25), thời gian (120 phút), điểm sàn Pass (70%).
+  - **📜 Nhật ký Hoạt động (Audit Logs)**: Ghi lại toàn bộ thao tác đăng nhập, chỉnh sửa câu hỏi, thay đổi phân quyền.
 
 ---
 

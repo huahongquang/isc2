@@ -7,6 +7,10 @@
       "destination": "/isc2_data.json"
     },
     {
+      "source": "/api/users",
+      "destination": "/users.json"
+    },
+    {
       "source": "/api/pdf",
       "destination": "/Certified_in_Cybersecurity_CC_Exam_Guide.pdf"
     }
